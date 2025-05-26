@@ -1,0 +1,53 @@
+
+version: '3.8'
+services:
+
+  agent-1:
+    build:
+      context: .
+      dockerfile: agent/Dockerfile
+    container_name: agent-1
+    environment:
+      - AGENT_USERNAME=AutoAgent1
+      - AGENT_PASSWORD=AutoPassword
+      - BACKEND_URL=http://hitachi-control-backend:4000
+      - JWT_SECRET=supersegretosegretissimo
+    networks:
+      - modbus-network
+      - backend-network
+
+  agent-2:
+    build:
+      context: .
+      dockerfile: agent/Dockerfile
+    container_name: agent-2
+    environment:
+      - AGENT_USERNAME=AutoAgent2
+      - AGENT_PASSWORD=AutoPassword
+      - BACKEND_URL=http://hitachi-control-backend:4000
+      - JWT_SECRET=supersegretosegretissimo
+    networks:
+      - modbus-network
+      - backend-network
+
+  agent-3:
+    build:
+      context: .
+      dockerfile: agent/Dockerfile
+    container_name: agent-3
+    environment:
+      - AGENT_USERNAME=AutoAgent3
+      - AGENT_PASSWORD=AutoPassword
+      - BACKEND_URL=http://hitachi-control-backend:4000
+      - JWT_SECRET=supersegretosegretissimo
+    networks:
+      - modbus-network
+      - backend-network
+
+networks:
+  modbus-network:
+    external: true
+    name: modbus-network
+  backend-network:
+    external: true
+    name: backend-network

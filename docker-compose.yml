@@ -1,0 +1,133 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: hitachi-control-db-1
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${PGUSER}
+      POSTGRES_PASSWORD: ${PGPASSWORD}
+      POSTGRES_DB: ${PGDATABASE}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - backend-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: hitachi-control-backend
+    env_file:
+      - .env
+    environment:
+      DB_HOST: ${PGHOST}
+      DB_PORT: ${PGPORT}
+      DB_USER: ${PGUSER}
+      DB_PASSWORD: ${PGPASSWORD}
+      DB_NAME: ${PGDATABASE}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    depends_on:
+      - db
+    networks:
+      - backend-network
+
+  modbus-server-1:
+    build:
+      context: ./modbus-server
+      dockerfile: Dockerfile
+    container_name: hitachi-control-modbus-server-1
+    env_file:
+      - .env
+    environment:
+      SERVER_FILE: modbus_server_1.js
+      MODBUS_SERVERHOST_1: ${MODBUS_SERVERHOST_1}
+    ports:
+      - "${MODBUS_1_PORT}:${MODBUS_1_PORT}"
+    volumes:
+      - ./modbus-server:/app
+    networks:
+      modbus-network:
+        ipv4_address: ${MODBUS_SERVERHOST_1}
+    depends_on:
+      - backend
+
+  modbus-server-2:
+    build:
+      context: ./modbus-server
+      dockerfile: Dockerfile
+    container_name: hitachi-control-modbus-server-2
+    env_file:
+      - .env
+    environment:
+      SERVER_FILE: modbus_server_2.js
+      MODBUS_SERVERHOST_2: ${MODBUS_SERVERHOST_2}
+    ports:
+      - "${MODBUS_2_PORT}:${MODBUS_2_PORT}"
+    volumes:
+      - ./modbus-server:/app
+    networks:
+      modbus-network:
+        ipv4_address: ${MODBUS_SERVERHOST_2}
+    depends_on:
+      - backend
+      
+  modbus-server-3:
+    build:
+      context: ./modbus-server
+      dockerfile: Dockerfile
+    container_name: hitachi-control-modbus-server-3
+    env_file:
+      - .env
+    environment:
+      SERVER_FILE: modbus_server_3.js
+      MODBUS_SERVERHOST_3: ${MODBUS_SERVERHOST_3}
+    ports:
+      - "${MODBUS_3_PORT}:${MODBUS_3_PORT}"
+    volumes:
+      - ./modbus-server:/app
+    networks:
+      modbus-network:
+        ipv4_address: ${MODBUS_SERVERHOST_3}
+    depends_on:
+      - backend
+
+  modbus-server-4:
+    build:
+      context: ./modbus-server
+      dockerfile: Dockerfile
+    container_name: hitachi-control-modbus-server-4
+    env_file:
+      - .env
+    environment:
+      SERVER_FILE: modbus_server_4.js
+      MODBUS_SERVERHOST_4: ${MODBUS_SERVERHOST_4}
+    ports:
+      - "${MODBUS_4_PORT}:${MODBUS_4_PORT}"
+    volumes:
+      - ./modbus-server:/app
+    networks:
+      modbus-network:
+        ipv4_address: ${MODBUS_SERVERHOST_4}
+    depends_on:
+      - backend
+
+networks:
+  modbus-network:
+    driver: bridge
+    name: modbus-network
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24
+  backend-network:
+    driver: bridge
+    name: backend-network
+    ipam:
+      config:
+        - subnet: 192.120.1.0/24

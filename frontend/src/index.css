@@ -1,0 +1,10 @@
+/* Aggiungi le direttive Tailwind all'inizio del tuo CSS */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+html, body, #root {
+  /* Rimuovi o modifica l'altezza se non vuoi che sia al 100% */
+  height: auto; /* O lascia la default */
+}
