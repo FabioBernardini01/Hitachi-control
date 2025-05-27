@@ -46,7 +46,6 @@ export default function Dashboard() {
   const [summaryPrinter, setSummaryPrinter] = useState(null);
   const [summaryKey, setSummaryKey] = useState(0);
 
-
   // Precompila i campi email quando apri la modale
   const handleOpenEmailModal = () => {
     setEmailFields({
@@ -63,7 +62,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     axios
-      .get(`{BACKEND_URL}/me/company`, {
+      .get(`${BACKEND_URL}/me/company`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setCompany(res.data))
@@ -73,7 +72,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (company) {
       axios
-        .get(`{BACKEND_URL}/printers`, {
+        .get(`${BACKEND_URL}/printers`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => {
@@ -89,7 +88,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     axios
-      .get(`{BACKEND_URL}/me/username`, {
+      .get(`${BACKEND_URL}/me/username`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setUser(res.data.username))
@@ -99,7 +98,7 @@ export default function Dashboard() {
   const handleDelete = (printerId) => {
     axios
       .post(
-        `{BACKEND_URL}/printer/delete`,
+        `${BACKEND_URL}/printer/delete`,
         { id: printerId },
         { headers: { Authorization: `Bearer ${token}` } }
       )
@@ -127,7 +126,7 @@ export default function Dashboard() {
     async function doRefresh() {
       if (!refreshToken) return;
       try {
-        const res = await axios.post(`{BACKEND_URL}/refresh`, { refreshToken });
+        const res = await axios.post(`${BACKEND_URL}/refresh`, { refreshToken });
         setToken(res.data.token);
         if (res.data.refreshToken) setRefreshToken(res.data.refreshToken);
         console.log("[FE] Token JWT aggiornato tramite refresh token");
@@ -141,113 +140,113 @@ export default function Dashboard() {
   }, [refreshToken, setToken, setRefreshToken, logout]);
 
   // Stato stampante: logica richiesta + dettagli per tooltip
- async function fetchPrinterStatus(printer) {
-  try {
-    // Leggi holding registro 0 (Start/Stop)
-    const holdingRes = await axios.post(
-      `{BACKEND_URL}/readStatus`,
-      { name: printer.name, address: 0, length: 1 },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    const holding0 = holdingRes.data?.data?._values?.[0];
+  async function fetchPrinterStatus(printer) {
+    try {
+      // Leggi holding registro 0 (Start/Stop)
+      const holdingRes = await axios.post(
+        `${BACKEND_URL}/readStatus`,
+        { name: printer.name, address: 0, length: 1 },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const holding0 = holdingRes.data?.data?._values?.[0];
 
-    // Leggi input registri 0x0004, 0x0005, 0x0006 (errori)
-    const errorRes = await axios.post(
-      `{BACKEND_URL}/readInputRegister`,
-      { name: printer.name, address: 0x0004, length: 3 },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    const [functionCode, classification, errorFactor] = errorRes.data?.data?._values || [];
-    const errorPresent = functionCode !== 0 || classification !== 0 || errorFactor !== 0;
+      // Leggi input registri 0x0004, 0x0005, 0x0006 (errori)
+      const errorRes = await axios.post(
+        `${BACKEND_URL}/readInputRegister`,
+        { name: printer.name, address: 0x0004, length: 3 },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const [functionCode, classification, errorFactor] = errorRes.data?.data?._values || [];
+      const errorPresent = functionCode !== 0 || classification !== 0 || errorFactor !== 0;
 
-    // Leggi livello inchiostro (registro input 0x0BEB)
-    const inkRes = await axios.post(
-      `{BACKEND_URL}/readInputRegister`,
-      { name: printer.name, address: 0x0BEB, length: 1 },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    const inkLevel = inkRes.data?.data?._values?.[0];
+      // Leggi livello inchiostro (registro input 0x0BEB)
+      const inkRes = await axios.post(
+        `${BACKEND_URL}/readInputRegister`,
+        { name: printer.name, address: 0x0BEB, length: 1 },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const inkLevel = inkRes.data?.data?._values?.[0];
 
-    // Leggi registro warning (input 0x0003)
-    const warningRes = await axios.post(
-      `{BACKEND_URL}/readInputRegister`,
-      { name: printer.name, address: 0x0003, length: 1 },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    const warningRegister = warningRes.data?.data?._values?.[0];
+      // Leggi registro warning (input 0x0003)
+      const warningRes = await axios.post(
+        `${BACKEND_URL}/readInputRegister`,
+        { name: printer.name, address: 0x0003, length: 1 },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const warningRegister = warningRes.data?.data?._values?.[0];
 
-    // --- LOGICA STATO + MOTIVI ---
-    let status = "green";
-    let reasons = [];
-    let errorLabel = null;
+      // --- LOGICA STATO + MOTIVI ---
+      let status = "green";
+      let reasons = [];
+      let errorLabel = null;
 
-    if (holding0 === 0) {
-      status = "red";
-      reasons.push("Stampante in STOP (holding 0)");
-    }
-    if (errorPresent) {
-      status = "red";
-      const errorKey = `0x${functionCode?.toString(16).padStart(4, '0')}-0x${classification?.toString(16).padStart(4, '0')}-0x${errorFactor?.toString(16).padStart(4, '0')}`.toLowerCase();
-      const preset = HITACHI_ERROR_PRESETS[errorKey];
-      errorLabel = preset ? preset.label : `Errore sconosciuto: functionCode=0x${functionCode?.toString(16)}, classification=0x${classification?.toString(16)}, errorFactor=0x${errorFactor?.toString(16)}`;
-      reasons.push(errorLabel);
-    }
-    if (typeof inkLevel === "number" && inkLevel <= 2) {
-      status = "red";
-      reasons.push(`Inchiostro troppo basso: ${inkLevel} (input 0x0BEB)`);
-    } else if (
-      (typeof inkLevel === "number" && inkLevel > 2 && inkLevel <= 40) ||
-      warningRegister === 1 // <-- AGGIUNTA: warning anche se registro warning è 1
-    ) {
-      if (status !== "red") status = "yellow";
-      if (inkLevel > 2 && inkLevel <= 40) {
-        reasons.push(`Inchiostro basso: ${inkLevel} (input 0x0BEB)`);
+      if (holding0 === 0) {
+        status = "red";
+        reasons.push("Stampante in STOP (holding 0)");
       }
-      if (warningRegister === 1 && !(inkLevel > 2 && inkLevel <= 40)) {
-        reasons.push(`Warning attivo da registro (input 0x0003)`);
+      if (errorPresent) {
+        status = "red";
+        const errorKey = `0x${functionCode?.toString(16).padStart(4, '0')}-0x${classification?.toString(16).padStart(4, '0')}-0x${errorFactor?.toString(16).padStart(4, '0')}`.toLowerCase();
+        const preset = HITACHI_ERROR_PRESETS[errorKey];
+        errorLabel = preset ? preset.label : `Errore sconosciuto: functionCode=0x${functionCode?.toString(16)}, classification=0x${classification?.toString(16)}, errorFactor=0x${errorFactor?.toString(16)}`;
+        reasons.push(errorLabel);
       }
-    }
-    if (status === "green") {
-      reasons.push("Tutto OK");
-    }
+      if (typeof inkLevel === "number" && inkLevel <= 2) {
+        status = "red";
+        reasons.push(`Inchiostro troppo basso: ${inkLevel} (input 0x0BEB)`);
+      } else if (
+        (typeof inkLevel === "number" && inkLevel > 2 && inkLevel <= 40) ||
+        warningRegister === 1 // <-- AGGIUNTA: warning anche se registro warning è 1
+      ) {
+        if (status !== "red") status = "yellow";
+        if (inkLevel > 2 && inkLevel <= 40) {
+          reasons.push(`Inchiostro basso: ${inkLevel} (input 0x0BEB)`);
+        }
+        if (warningRegister === 1 && !(inkLevel > 2 && inkLevel <= 40)) {
+          reasons.push(`Warning attivo da registro (input 0x0003)`);
+        }
+      }
+      if (status === "green") {
+        reasons.push("Tutto OK");
+      }
 
-    setPrinterStatus(prev => ({
-      ...prev,
-      [printer.id]: status
-    }));
-    setPrinterDetails(prev => ({
-      ...prev,
-      [printer.id]: {
-        holding0,
-        functionCode,
-        classification,
-        errorFactor,
-        inkLevel,
-        warningRegister,
-        reasons,
-        errorLabel
-      }
-    }));
-  } catch (err) {
-    setPrinterStatus(prev => ({
-      ...prev,
-      [printer.id]: "red"
-    }));
-    setPrinterDetails(prev => ({
-      ...prev,
-      [printer.id]: {
-        holding0: "N/A",
-        functionCode: "N/A",
-        classification: "N/A",
-        errorFactor: "N/A",
-        inkLevel: "N/A",
-        warningRegister: "N/A",
-        reasons: ["Errore di comunicazione"],
-        errorLabel: "Errore di comunicazione"
-      }
-    }));
+      setPrinterStatus(prev => ({
+        ...prev,
+        [printer.id]: status
+      }));
+      setPrinterDetails(prev => ({
+        ...prev,
+        [printer.id]: {
+          holding0,
+          functionCode,
+          classification,
+          errorFactor,
+          inkLevel,
+          warningRegister,
+          reasons,
+          errorLabel
+        }
+      }));
+    } catch (err) {
+      setPrinterStatus(prev => ({
+        ...prev,
+        [printer.id]: "red"
+      }));
+      setPrinterDetails(prev => ({
+        ...prev,
+        [printer.id]: {
+          holding0: "N/A",
+          functionCode: "N/A",
+          classification: "N/A",
+          errorFactor: "N/A",
+          inkLevel: "N/A",
+          warningRegister: "N/A",
+          reasons: ["Errore di comunicazione"],
+          errorLabel: "Errore di comunicazione"
+        }
+      }));
+    }
   }
-}
 
   // Aggiorna stato stampanti ogni volta che cambia la lista
   useEffect(() => {
@@ -327,7 +326,7 @@ export default function Dashboard() {
     };
 
     axios
-      .post(`{BACKEND_URL}/printers`, newPrinter, {
+      .post(`${BACKEND_URL}/printers`, newPrinter, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
