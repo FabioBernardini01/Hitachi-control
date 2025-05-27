@@ -23,7 +23,7 @@ router.post('/readStatus', authenticateJWT, async (req, res) => {
       return res.status(404).json({ message: 'Stampante non trovata o non appartenente alla tua azienda.' });
     }
     const printer = result.rows[0];
-    console.log(`[READ STATUS] Stampante trovata:`, printer);
+    //console.log(`[READ STATUS] Stampante trovata:`, printer);
 
     // Accoda il comando
     const payload = {
