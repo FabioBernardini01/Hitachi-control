@@ -10,8 +10,12 @@ const apiRoutes = require('./routes');
 const app = express();
 
 // Middleware CORS: consente le richieste dal frontend React
-app.use(cors({ origin: 'http://localhost:3000' }));
-
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'https://hitachi-control.onrender.com'
+  ]
+}));
 // Middleware per parse del JSON nelle richieste
 app.use(express.json());
 
