@@ -41,6 +41,8 @@ CREATE TABLE IF NOT EXISTS commands (
   executed_at TIMESTAMP
 );
 
+
+
 -- Impone unicità del nome stampante per azienda
 ALTER TABLE printers
 ADD CONSTRAINT unique_name_per_company UNIQUE (name, company_id);

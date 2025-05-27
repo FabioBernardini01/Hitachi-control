@@ -18,7 +18,6 @@ router.post('/printer/delete', authenticateJWT, async (req, res) => {
 
     //Nel backend, prima elimina i comandi:
 await req.db.query('DELETE FROM commands WHERE printer_id = $1', [printerId]);
-await req.db.query('DELETE FROM printers WHERE id = $1', [printerId]);
 
     // Elimina la stampante
     const deleteQuery = 'DELETE FROM printers WHERE id = $1';

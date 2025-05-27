@@ -4,7 +4,7 @@ const printers = [
   {
     name: 'Stampante 1',
     model: 'Hitachi UX2',
-    ip_address: '192.168.1.10',
+    ip_address: '192.168.1.65',
     modbus_port: '503',
     modbus_address: '1',
     description: 'Stampante Modbus 1',
@@ -13,7 +13,7 @@ const printers = [
   {
     name: 'Stampante 2',
     model: 'Hitachi UX2',
-    ip_address: '192.168.1.11',
+    ip_address: '192.168.1.65',
     modbus_port: '504',
     modbus_address: '1',
     description: 'Stampante Modbus 2',
@@ -22,7 +22,7 @@ const printers = [
   {
     name: 'Stampante 1',
     model: 'Hitachi UX2',
-    ip_address: '192.168.1.12',
+    ip_address: '192.168.1.65',
     modbus_port: '505',
     modbus_address: '1',
     description: 'Stampante Modbus 3',

@@ -1,7 +1,7 @@
 const { Client } = require('pg');
 
 const companies = [
-  { name: 'aziendaX', agent_ip: 'agent-1', email1: 'ouuAzX@awdaw', email2: 'onwdded@dwgma', email3: 'e987l3@gmail.com' }, 
+  { name: 'aziendaX', agent_ip: 'agent-1', email1: 'fabio.bernardini.1992@gmail.com', email2: 'onwdded@dwgma', email3: 'e987l3@gmail.com' }, 
   { name: 'aziendaY', agent_ip: 'agent-2', email1: 'pioAzYY@awdaw', email2: 'dnwd34@dwgma', email3: 'email398776@gmail.com' },
   { name: 'aziendaZ', agent_ip: 'agent-3', email1: 'miZZZZo@awdaw', email2: '', email3: '' },
 ];
