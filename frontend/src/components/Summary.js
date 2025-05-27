@@ -14,19 +14,19 @@ export default function Summary({ printer, token, onClose }) {
       try {
         // Leggi registri utili
         const [holding0, opStatus, warning, error, ink] = await Promise.all([
-          axios.post("${BACKEND_URL}/readStatus", {
+          axios.post(`${BACKEND_URL}/readStatus`, {
             name: printer.name, address: 0x0000, length: 1
           }, { headers: { Authorization: `Bearer ${token}` } }),
-          axios.post("${BACKEND_URL}/readInputRegister", {
+          axios.post(`${BACKEND_URL}/readInputRegister`, {
             name: printer.name, address: 0x0002, length: 1
           }, { headers: { Authorization: `Bearer ${token}` } }),
-          axios.post("${BACKEND_URL}/readInputRegister", {
+          axios.post(`${BACKEND_URL}/readInputRegister`, {
             name: printer.name, address: 0x0003, length: 1
           }, { headers: { Authorization: `Bearer ${token}` } }),
-          axios.post("${BACKEND_URL}/readInputRegister", {
+          axios.post(`${BACKEND_URL}/readInputRegister`, {
             name: printer.name, address: 0x0004, length: 3
           }, { headers: { Authorization: `Bearer ${token}` } }),
-          axios.post("${BACKEND_URL}/readInputRegister", {
+          axios.post(`${BACKEND_URL}/readInputRegister`, {
             name: printer.name, address: 0x0BEB, length: 1
           }, { headers: { Authorization: `Bearer ${token}` } }),
         ]);

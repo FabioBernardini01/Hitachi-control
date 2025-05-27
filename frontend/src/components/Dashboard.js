@@ -63,7 +63,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     axios
-      .get("${BACKEND_URL}/me/company", {
+      .get(`{BACKEND_URL}/me/company`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setCompany(res.data))
@@ -73,7 +73,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (company) {
       axios
-        .get("${BACKEND_URL}/printers", {
+        .get(`{BACKEND_URL}/printers`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => {
@@ -89,7 +89,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     axios
-      .get("${BACKEND_URL}/me/username", {
+      .get(`{BACKEND_URL}/me/username`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setUser(res.data.username))
@@ -99,7 +99,7 @@ export default function Dashboard() {
   const handleDelete = (printerId) => {
     axios
       .post(
-        "${BACKEND_URL}/printer/delete",
+        `{BACKEND_URL}/printer/delete`,
         { id: printerId },
         { headers: { Authorization: `Bearer ${token}` } }
       )
@@ -127,7 +127,7 @@ export default function Dashboard() {
     async function doRefresh() {
       if (!refreshToken) return;
       try {
-        const res = await axios.post("${BACKEND_URL}/refresh", { refreshToken });
+        const res = await axios.post(`{BACKEND_URL}/refresh`, { refreshToken });
         setToken(res.data.token);
         if (res.data.refreshToken) setRefreshToken(res.data.refreshToken);
         console.log("[FE] Token JWT aggiornato tramite refresh token");
@@ -145,7 +145,7 @@ export default function Dashboard() {
   try {
     // Leggi holding registro 0 (Start/Stop)
     const holdingRes = await axios.post(
-      "${BACKEND_URL}/readStatus",
+      `{BACKEND_URL}/readStatus`,
       { name: printer.name, address: 0, length: 1 },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -153,7 +153,7 @@ export default function Dashboard() {
 
     // Leggi input registri 0x0004, 0x0005, 0x0006 (errori)
     const errorRes = await axios.post(
-      "${BACKEND_URL}/readInputRegister",
+      `{BACKEND_URL}/readInputRegister`,
       { name: printer.name, address: 0x0004, length: 3 },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -162,7 +162,7 @@ export default function Dashboard() {
 
     // Leggi livello inchiostro (registro input 0x0BEB)
     const inkRes = await axios.post(
-      "${BACKEND_URL}/readInputRegister",
+      `{BACKEND_URL}/readInputRegister`,
       { name: printer.name, address: 0x0BEB, length: 1 },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -170,7 +170,7 @@ export default function Dashboard() {
 
     // Leggi registro warning (input 0x0003)
     const warningRes = await axios.post(
-      "${BACKEND_URL}/readInputRegister",
+      `{BACKEND_URL}/readInputRegister`,
       { name: printer.name, address: 0x0003, length: 1 },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -279,7 +279,7 @@ export default function Dashboard() {
     }
     try {
       await axios.post(
-        "${BACKEND_URL}/company/updateEmails",
+        `${BACKEND_URL}/company/updateEmails`,
         {
           id: company.id,
           email1: emailFields.email1,
@@ -327,7 +327,7 @@ export default function Dashboard() {
     };
 
     axios
-      .post("${BACKEND_URL}/printers", newPrinter, {
+      .post(`{BACKEND_URL}/printers`, newPrinter, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {

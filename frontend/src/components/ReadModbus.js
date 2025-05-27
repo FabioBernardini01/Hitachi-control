@@ -154,8 +154,8 @@ export default function ReadModbus({ printerName = "", onCancel, onUpdate }) {
     try {
       const url =
         selectedRegisterType === "input"
-          ? "${BACKEND_URL}/readInputRegister"
-          : "${BACKEND_URL}/readStatus";
+          ? `${BACKEND_URL}/readInputRegister`
+          : `${BACKEND_URL}/readStatus`;
 
       const response = await axios.post(
         url,
@@ -221,7 +221,7 @@ export default function ReadModbus({ printerName = "", onCancel, onUpdate }) {
     setWriteLoading(true);
     try {
       await axios.post(
-        "${BACKEND_URL}/writeRegisters",
+        `${BACKEND_URL}/writeRegisters`,
         {
           name,
           address: Number(writeAddress),
@@ -240,7 +240,7 @@ export default function ReadModbus({ printerName = "", onCancel, onUpdate }) {
       } else {
         // Altrimenti, fai una read solo del registro appena scritto
         const url =
-          "${BACKEND_URL}/readStatus"; // solo holding, perché aggiorni solo holding
+          `${BACKEND_URL}/readStatus`; // solo holding, perché aggiorni solo holding
         const response = await axios.post(
           url,
           { name, address: Number(writeAddress), length: 1 },
