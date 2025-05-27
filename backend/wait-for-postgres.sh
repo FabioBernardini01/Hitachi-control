@@ -5,7 +5,7 @@ HOST="${PGHOST}"
 PORT="${PGPORT}"
 
 echo "⏳ Attendo che PostgreSQL sia pronto su $HOST:$PORT..."
-
+echo "DEBUG: PGHOST=$PGHOST PGPORT=$PGPORT"
 # Loop finché la porta del DB non è accessibile
 while ! nc -z "$HOST" "$PORT"; do
   sleep 1
