@@ -41,7 +41,7 @@ router.post('/readInputRegister', authenticateJWT, async (req, res) => {
         JSON.stringify(payload)
       ]
     );
-    console.log('[READ INPUT] Comando accodato:', { commandId: insertCmd.rows[0].id, payload });
+    //console.log('[READ INPUT] Comando accodato:', { commandId: insertCmd.rows[0].id, payload });
 
     const commandId = insertCmd.rows[0].id;
 

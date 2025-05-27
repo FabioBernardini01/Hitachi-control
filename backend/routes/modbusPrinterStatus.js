@@ -43,7 +43,7 @@ router.post('/readStatus', authenticateJWT, async (req, res) => {
         JSON.stringify(payload)
       ]
     );
-    console.log('[READ STATUS] Comando accodato:', { commandId: insertCmd.rows[0].id, payload });
+    //console.log('[READ STATUS] Comando accodato:', { commandId: insertCmd.rows[0].id, payload });
 
     const commandId = insertCmd.rows[0].id;
 
