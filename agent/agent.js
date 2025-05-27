@@ -1,13 +1,30 @@
 const { readPrinterInputRegister, writePrinterRegisters, readPrinterStatus } = require('./clientmodbus');
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 
 // CONFIGURAZIONE AGENT tramite variabili d'ambiente
 const AGENT_USERNAME = process.env.AGENT_USERNAME;
 const AGENT_PASSWORD = process.env.AGENT_PASSWORD;
-const BACKEND_URL = process.env.BACKEND_URL || 'http://hitachi-control-backend:4000';
-const POLL_INTERVAL = 10000; // ms
-const POLL_INTERVAL_BE = 100; // ms
+const BACKEND_URL = process.env.BACKEND_URL || 'https://hitachi-control-backend.onrender.com';
+const POLL_INTERVAL = 20000; // ms
+const POLL_INTERVAL_BE = 1000; // ms
+
+console.log("DEBUG AGENT_USERNAME:", process.env.AGENT_USERNAME);
+console.log("DEBUG AGENT_PASSWORD:", process.env.AGENT_PASSWORD);
+console.log("DEBUG BACKEND_URL:", process.env.BACKEND_URL);
+
+
+const smtpTransport = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: parseInt(process.env.SMTP_PORT, 10),
+  secure: process.env.SMTP_SECURE === 'true', // true per 465, false per 587
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
+
 
 let printers = [];
 let emailRecipients = [];
@@ -23,6 +40,8 @@ async function hasInternet() {
   return true;
 }
 
+
+/*
 // --- Funzione invio email (mock con coda e internet check) ---
 async function sendEmail(recipients, subject, text) {
   if (!recipients || recipients.length === 0) {
@@ -37,16 +56,42 @@ async function sendEmail(recipients, subject, text) {
   console.log(`\n--- EMAIL FINTA ---\nTO: ${recipients.join(', ')}\nSUBJECT: ${subject}\nBODY:\n${text}\n-------------------\n`);
 }
 
+*/
+
+
+async function sendEmail(recipients, subject, text) {
+  if (!recipients || recipients.length === 0) {
+    console.log('Nessun destinatario email specificato, email non inviata.');
+    return;
+  }
+  if (!(await hasInternet())) {
+    pendingEmails.push({ recipients, subject, text });
+    console.log('[EMAIL ACCODATA] Internet assente, email accodata.');
+    return;
+  }
+  try {
+    let info = await smtpTransport.sendMail({
+      from: process.env.SMTP_FROM || process.env.SMTP_USER,
+      to: recipients.join(','),
+      subject,
+      text,
+    });
+    console.log(`[EMAIL INVIATA] TO: ${recipients.join(', ')} SUBJECT: ${subject} MESSAGE_ID: ${info.messageId}`);
+  } catch (err) {
+    pendingEmails.push({ recipients, subject, text });
+    console.error('[EMAIL ERRORE] Invio fallito, email accodata:', err.message);
+  }
+}
+
 async function flushPendingEmails() {
   if (pendingEmails.length === 0) return;
   if (!(await hasInternet())) return;
   console.log(`[EMAIL] Internet ripristinato, invio ${pendingEmails.length} email accodate...`);
   for (const mail of pendingEmails) {
-    console.log(`\n--- EMAIL FINTA (DA CODA) ---\nTO: ${mail.recipients.join(', ')}\nSUBJECT: ${mail.subject}\nBODY:\n${mail.text}\n-------------------\n`);
+    await sendEmail(mail.recipients, mail.subject, mail.text);
   }
   pendingEmails = [];
 }
-
 // --- Login e refresh token ---
 async function getAgentToken(username, password, backendUrl) {
   try {
