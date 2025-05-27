@@ -16,6 +16,8 @@ RUN npm install
 # Copia tutto il backend
 COPY . .
 
+
+EXPOSE 4000
 # Rendi eseguibile lo script di attesa
 RUN chmod +x wait-for-postgres.sh
 
