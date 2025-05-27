@@ -6,6 +6,5 @@ COPY agent/package*.json ./
 RUN npm install
 
 COPY agent/. .
-COPY shared ./shared
 
 CMD ["node", "agent.js"]
