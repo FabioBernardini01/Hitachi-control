@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 
 const AuthContext = createContext();
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:4000";
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem("token"));
@@ -12,7 +13,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (username, password) => {
-    const res = await axios.post("http://localhost:4000/login", { username, password });
+    const res = await axios.post("${BACKEND_URL}/login", { username, password });
     localStorage.setItem("token", res.data.token);
     setToken(res.data.token);
   };

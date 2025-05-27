@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "./AuthContext";
-
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:4000";
 // Definisci qui tutti i registri usati, con indirizzo, label e tipo
 const REGISTER_DEFINITIONS = [
   // Holding registers
@@ -154,8 +154,8 @@ export default function ReadModbus({ printerName = "", onCancel, onUpdate }) {
     try {
       const url =
         selectedRegisterType === "input"
-          ? "http://localhost:4000/readInputRegister"
-          : "http://localhost:4000/readStatus";
+          ? "${BACKEND_URL}/readInputRegister"
+          : "${BACKEND_URL}/readStatus";
 
       const response = await axios.post(
         url,
@@ -221,7 +221,7 @@ export default function ReadModbus({ printerName = "", onCancel, onUpdate }) {
     setWriteLoading(true);
     try {
       await axios.post(
-        "http://localhost:4000/writeRegisters",
+        "${BACKEND_URL}/writeRegisters",
         {
           name,
           address: Number(writeAddress),
@@ -240,7 +240,7 @@ export default function ReadModbus({ printerName = "", onCancel, onUpdate }) {
       } else {
         // Altrimenti, fai una read solo del registro appena scritto
         const url =
-          "http://localhost:4000/readStatus"; // solo holding, perché aggiorni solo holding
+          "${BACKEND_URL}/readStatus"; // solo holding, perché aggiorni solo holding
         const response = await axios.post(
           url,
           { name, address: Number(writeAddress), length: 1 },
