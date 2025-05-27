@@ -16,6 +16,10 @@ router.post('/printer/delete', authenticateJWT, async (req, res) => {
       return res.status(404).json({ error: 'Stampante non trovata o non appartenente all\'azienda' });
     }
 
+    //Nel backend, prima elimina i comandi:
+await req.db.query('DELETE FROM commands WHERE printer_id = $1', [printerId]);
+await req.db.query('DELETE FROM printers WHERE id = $1', [printerId]);
+
     // Elimina la stampante
     const deleteQuery = 'DELETE FROM printers WHERE id = $1';
     await req.db.query(deleteQuery, [printerId]);
