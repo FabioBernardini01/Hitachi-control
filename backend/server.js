@@ -48,18 +48,18 @@ app.listen(process.env.SERVER_PORT || 4000, '0.0.0.0', () => {
 });
 
 
-// --- Cleanup automatico dei comandi eseguiti/errore più vecchi di 1 ora ---
+// --- Cleanup automatico dei comandi eseguiti/errore più vecchi di 1 minuto/5 giorni ---
 setInterval(async () => {
   try {
     // Elimina comandi executed più vecchi di 1 minuto
     await client.query(
       `DELETE FROM commands WHERE status = 'executed' AND executed_at < NOW() - INTERVAL '1 minute'`
-        );
+    );
     // Elimina comandi error più vecchi di 5 giorni
     await client.query(
-          `DELETE FROM commands WHERE status = 'error' AND executed_at < NOW() - INTERVAL '5 days'`
-        );
-      } catch (err) {
-        console.error('Errore cleanup comandi:', err);
-      }
-    }, 5 * 24 * 60 * 60 * 1000);  // ogni 5 giorni
+      `DELETE FROM commands WHERE status = 'error' AND executed_at < NOW() - INTERVAL '5 days'`
+    );
+  } catch (err) {
+    console.error('Errore cleanup comandi:', err);
+  }
+}, 60 * 1000);  // ogni 1 minuto
