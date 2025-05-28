@@ -69,7 +69,7 @@ router.post('/readStatus', authenticateJWT, async (req, res) => {
       console.error(`[READ STATUS] Errore agent per comando id=${commandId}:`, resultCmd.result);
       return res.status(500).json({ message: 'Errore agent', detail: resultCmd.result });
     }
-    console.log(`[READ STATUS] Risposta agent per comando id=${commandId}:`, resultCmd.result);
+    //console.log(`[READ STATUS] Risposta agent per comando id=${commandId}:`, resultCmd.result);
     res.json({ success: true, data: resultCmd.result.data });
 
   } catch (error) {
