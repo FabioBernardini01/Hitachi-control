@@ -21,6 +21,7 @@ router.post('/readInputRegister', authenticateJWT, async (req, res) => {
       return res.status(404).json({ message: 'Stampante non trovata o non appartenente alla tua azienda.' });
     }
     const printer = result.rows[0];
+    //console.log(`[READ INPUT] Stampante trovata:`, printer);
 
     // Accoda il comando
     const payload = {
@@ -40,6 +41,7 @@ router.post('/readInputRegister', authenticateJWT, async (req, res) => {
         JSON.stringify(payload)
       ]
     );
+    //console.log('[READ INPUT] Comando accodato:', { commandId: insertCmd.rows[0].id, payload });
 
     const commandId = insertCmd.rows[0].id;
 
@@ -57,14 +59,15 @@ router.post('/readInputRegister', authenticateJWT, async (req, res) => {
       await new Promise(r => setTimeout(r, 500));
     }
 
-    // --- NUOVA LOGICA: se il comando non esiste più, è stato eseguito con successo ed eliminato ---
     if (!resultCmd) {
-      return res.json({ success: true, data: null });
+      console.warn(`[READ INPUT] Timeout per comando id=${commandId}`);
+      return res.status(504).json({ message: 'Timeout: nessuna risposta dall\'agent.' });
     }
     if (resultCmd.status === 'error') {
       console.error(`[READ INPUT] Errore agent per comando id=${commandId}:`, resultCmd.result);
       return res.status(500).json({ message: 'Errore agent', detail: resultCmd.result });
     }
+    console.log(`[READ INPUT] Risposta agent per comando id=${commandId}:`, resultCmd.result);
     res.json({ success: true, data: resultCmd.result.data });
 
   } catch (error) {
