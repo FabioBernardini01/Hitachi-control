@@ -52,10 +52,9 @@ app.listen(process.env.SERVER_PORT || 4000, '0.0.0.0', () => {
 setInterval(async () => {
   try {
     await client.query(
-      `DELETE FROM commands WHERE status IN ('executed', 'error') AND executed_at < NOW() - INTERVAL '1 hour'`
-    );
-    // console.log('Cleanup comandi eseguito');
-  } catch (err) {
-    console.error('Errore cleanup comandi:', err);
-  }
-}, 60 * 60 * 1000); // ogni ora
+          `DELETE FROM commands WHERE status = 'error' AND executed_at < NOW() - INTERVAL '5 days'`
+        );
+      } catch (err) {
+        console.error('Errore cleanup comandi:', err);
+      }
+    }, 5 * 24 * 60 * 60 * 1000);  // ogni 5 giorni
