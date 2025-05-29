@@ -1,5 +1,6 @@
 const express = require('express');
 const { authenticateJWT } = require('../middleware/auth');
+const agentSockets = require('../agentSockets');
 
 const router = express.Router();
 
@@ -27,7 +28,7 @@ router.post('/printers', authenticateJWT, async (req, res) => {
         error: 'Esiste già una stampante con questa combinazione di IP, porta e indirizzo Modbus' 
       });
     }
- // ⚠️ Verifica se esiste già una stampante con la stessa combinazione IP + Porta
+    // ⚠️ Verifica se esiste già una stampante con la stessa combinazione IP + Porta
     const existing2 = await db.query(
       `SELECT id FROM printers 
        WHERE ip_address = $1 AND modbus_port = $2`,
@@ -39,7 +40,7 @@ router.post('/printers', authenticateJWT, async (req, res) => {
         error: 'Esiste già una stampante con questa combinazione di IP, porta' 
       });
     }
-//CANCELLA BLOCCO SOPRA SE IP+MODBUS uguale va bene (al netto di uid differente)
+    //CANCELLA BLOCCO SOPRA SE IP+MODBUS uguale va bene (al netto di uid differente)
 
     // 🟢 Inserisce la stampante se tutto ok
     const result = await db.query(
@@ -50,6 +51,13 @@ router.post('/printers', authenticateJWT, async (req, res) => {
     );
 
     res.status(201).json(result.rows[0]);
+
+    // --- INVIO EVENTO SOCKET ---
+    const agentSocket = agentSockets.get(companyId);
+    if (agentSocket && agentSocket.connected) {
+      agentSocket.emit('company-updated');
+      console.log(`[WS] Evento company-updated inviato all'agent della company ${companyId} (stampante aggiunta)`);
+    }
 
   } catch (error) {
     if (error.code === '23505') {

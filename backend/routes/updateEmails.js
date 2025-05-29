@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { authenticateJWT } = require('../middleware/auth');
 const agentSockets = require('../agentSockets');
-// ...poi usa agentSockets.get(companyId)...
 
 router.post('/company/updateEmails', authenticateJWT, async (req, res) => {
   const { id, email1, email2, email3 } = req.body;
@@ -15,7 +14,7 @@ router.post('/company/updateEmails', authenticateJWT, async (req, res) => {
     try {
       const agentSocket = agentSockets.get(id);
       if (agentSocket && agentSocket.connected) {
-        agentSocket.emit('company-emails-updated');
+        agentSocket.emit('company-updated');
         console.log(`[WS] Evento company-emails-updated inviato all'agent della company ${id}`);
       } else {
         console.log(`[WS] Nessun agent collegato per company ${id}, nessun evento inviato`);
