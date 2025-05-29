@@ -47,7 +47,7 @@ app.use((req, res, next) => {
 app.use('/', apiRoutes);
 
 // Avvia il server
-app.listen(process.env.SERVER_PORT || 4000, '0.0.0.0', () => {
+server.listen(process.env.SERVER_PORT || 4000, '0.0.0.0', () => {
   console.log(`Server listening on port ${process.env.SERVER_PORT || 4000}`);
 });
 
