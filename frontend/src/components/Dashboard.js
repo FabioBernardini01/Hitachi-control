@@ -262,7 +262,7 @@ export default function Dashboard() {
   useEffect(() => {
     const interval = setInterval(() => {
       printers.forEach(printer => fetchPrinterStatus(printer));
-    }, 5*1000);
+    }, 5*1000); // ogni 5 secondi chiede lo stato delle stampanti
     return () => clearInterval(interval);
     // eslint-disable-next-line
   }, [printers, token]);
