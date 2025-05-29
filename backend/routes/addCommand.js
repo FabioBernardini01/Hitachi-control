@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateJWT } = require('../middleware/auth');
+const agentSockets = require('../agentSockets');
 
 // Un utente FE/BE accoda un comando per una stampante
 router.post('/commands/add', authenticateJWT, async (req, res) => {
@@ -14,7 +15,7 @@ router.post('/commands/add', authenticateJWT, async (req, res) => {
       `INSERT INTO commands (company_id, printer_id, type, payload, status) VALUES ($1, $2, $3, $4, 'pending')`,
       [companyId, printer_id, type, JSON.stringify(payload)]
     );
-    const agentSockets = require('../agentSockets');
+   
 const agentSocket = agentSockets.get(companyId);
 if (agentSocket && agentSocket.connected) {
   agentSocket.emit('execute-commands');
