@@ -14,8 +14,8 @@ router.post('/company/updateEmails', authenticateJWT, async (req, res) => {
     );
   const companyId = req.body.id;
   const agentSocket = agentSockets.get(companyId);
-  if (agentSocket) {
-    agentSocket.emit('company-emails-updated');
+ if (agentSocket && agentSocket.connected) {
+  agentSocket.emit('company-emails-updated');
     console.log(`[WS] Inviato evento company-emails-updated all'agent della company ${companyId}`);
   }
     res.json({ ok: true });
