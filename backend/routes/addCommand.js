@@ -14,6 +14,12 @@ router.post('/commands/add', authenticateJWT, async (req, res) => {
       `INSERT INTO commands (company_id, printer_id, type, payload, status) VALUES ($1, $2, $3, $4, 'pending')`,
       [companyId, printer_id, type, JSON.stringify(payload)]
     );
+    const agentSockets = require('../agentSockets');
+const agentSocket = agentSockets.get(companyId);
+if (agentSocket && agentSocket.connected) {
+  agentSocket.emit('execute-commands');
+  console.log(`[WS] Evento execute-commands inviato all'agent della company ${companyId}`);
+}
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: 'Errore accodamento comando' });
