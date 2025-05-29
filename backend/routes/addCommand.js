@@ -6,7 +6,7 @@ const agentSockets = require('../agentSockets');
 // Un utente FE/BE accoda un comando per una stampante
 router.post('/commands/add', authenticateJWT, async (req, res) => {
   const { printer_id, type, payload } = req.body;
-  const companyId = req.user.companyId;
+  const companyId = req.user.company_Id;
   if (!printer_id || !type || !payload) {
     return res.status(400).json({ error: 'Dati comando mancanti' });
   }
