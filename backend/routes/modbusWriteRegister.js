@@ -39,6 +39,14 @@ router.post('/writeRegisters', authenticateJWT, async (req, res) => {
         })
       ]
     );
+
+    const agentSockets = require('../agentSockets');
+const agentSocket = agentSockets.get(companyId);
+if (agentSocket && agentSocket.connected) {
+  agentSocket.emit('execute-commands');
+  console.log(`[WS] Evento execute-commands inviato all'agent della company ${companyId}`);
+}
+
     const commandId = insertCmd.rows[0].id;
 
     // Attendi che l'agent esegua il comando (polling breve, max 10s)
