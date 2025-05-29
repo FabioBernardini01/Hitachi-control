@@ -2,12 +2,17 @@ const express = require('express');
 const { Client } = require('pg');
 const cors = require('cors');
 const apiRoutes = require('./routes');
+const http = require('http');
 
 // Carica variabili ambiente da .env
 //dotenv.config({ path: '/home/fabio/hitachi-control/.env' });
 
 
 const app = express();
+
+
+
+const server = http.createServer(app);
 
 // Middleware CORS: consente le richieste dal frontend React
 app.use(cors({
@@ -30,9 +35,8 @@ const client = new Client({
 
 // Connessione al database
 client.connect()
-  .then(() => console.log('✅ Connessione al database PostgreSQL riuscita'))
+  .then(() => console.lquog('✅ Connessione al database PostgreSQL riuscita'))
   .catch(err => console.error('❌ Errore nella connessione al DB:', err));
-
 // Middleware per iniettare il client PostgreSQL in ogni richiesta
 app.use((req, res, next) => {
   req.db = client;
@@ -47,6 +51,9 @@ app.listen(process.env.SERVER_PORT || 4000, '0.0.0.0', () => {
   console.log(`Server listening on port ${process.env.SERVER_PORT || 4000}`);
 });
 
+
+// Avvia la logica WebSocket
+require('./ws')(server); //
 
 // --- Cleanup automatico dei comandi eseguiti/errore più vecchi di 1 minuto/5 giorni ---
 setInterval(async () => {
@@ -63,3 +70,7 @@ setInterval(async () => {
     console.error('Errore cleanup comandi:', err);
   }
 }, 60 * 1000);  // ogni 1 minuto
+
+// ...existing code...
+
+module.exports = { client };

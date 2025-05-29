@@ -19,6 +19,7 @@
     "jsmodbus": "^4.0.10",
     "jsonwebtoken": "^9.0.2",
     "modbus-serial": "^8.0.8",
-    "pg": "^8.15.6"
+    "pg": "^8.15.6",
+    "socket.io": "^4.8.1"
   }
 }
