@@ -137,7 +137,7 @@ export default function Dashboard() {
         logout();
       }
     }
-    refreshIntervalRef.current = setInterval(doRefresh, 50 * 1000); // ogni 50 secondi
+    refreshIntervalRef.current = setInterval(doRefresh,59 * 60 * 1000); // ogni 59 minuti
     return () => clearInterval(refreshIntervalRef.current);
   }, [refreshToken, setToken, setRefreshToken, logout]);
 
