@@ -22,7 +22,7 @@ module.exports = function(server) {
       } catch (err) {
         socket.emit('printerStatus', []);
       }
-    }, 5000);
+    }, 1000);
 
     socket.on('disconnect', () => {
       clearInterval(interval);
