@@ -10,6 +10,9 @@ const modbusWriteRegister = require('./modbusWriteRegister');
 const modbusReadInputRegister = require('./modbusReadInputRegister');
 const refreshRoute = require('./refreshRoute');
 const updateEmails = require('./updateEmails');
+const agentCommandResult = require('./agentCommandResult');
+const agentNextCommand = require('./agentNextCommand');
+
 const router = express.Router();
 
 router.use(loginRoutes);
@@ -23,5 +26,8 @@ router.use(modbusWriteRegister);
 router.use(modbusReadInputRegister);
 router.use(refreshRoute);
 router.use(updateEmails);
+router.use(agentCommandResult);
+router.use(agentNextCommand);
 
 module.exports = router;
+
