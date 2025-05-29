@@ -35,7 +35,7 @@ const client = new Client({
 
 // Connessione al database
 client.connect()
-  .then(() => console.lquog('✅ Connessione al database PostgreSQL riuscita'))
+  .then(() => console.log('✅ Connessione al database PostgreSQL riuscita'))
   .catch(err => console.error('❌ Errore nella connessione al DB:', err));
 // Middleware per iniettare il client PostgreSQL in ogni richiesta
 app.use((req, res, next) => {
