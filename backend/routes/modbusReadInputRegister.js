@@ -46,7 +46,7 @@ router.post('/readInputRegister', authenticateJWT, async (req, res) => {
 const agentSocket = agentSockets.get(companyId);
 if (agentSocket && agentSocket.connected) {
   agentSocket.emit('execute-commands');
-  console.log(`[WS] Evento execute-commands inviato all'agent della company ${companyId}`);
+  //console.log(`[WS] Evento execute-commands inviato all'agent della company ${companyId}`);
 }
     //console.log('[READ INPUT] Comando accodato:', { commandId: insertCmd.rows[0].id, payload });
 
