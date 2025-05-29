@@ -1,6 +1,6 @@
 const { Server } = require('socket.io');
 const jwt = require('jsonwebtoken');
-const agentSockets = new Map(); // companyId -> socket
+const agentSockets = require('./agentSockets');
 
 module.exports = function(server, client) {
   const io = new Server(server, {

@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateJWT } = require('../middleware/auth');
-const { agentSockets } = require('../ws');
+const agentSockets = require('../agentSockets');
+// ...poi usa agentSockets.get(companyId)...
 
 router.post('/company/updateEmails', authenticateJWT, async (req, res) => {
   const { id, email1, email2, email3 } = req.body;
