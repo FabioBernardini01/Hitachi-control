@@ -1,5 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const router = express.Router();
 
 const refreshTokens = require('./login').refreshTokens;
@@ -11,6 +12,9 @@ router.post('/refresh', async (req, res) => {
   }
 
   const userId = refreshTokens[refreshToken];
+  // Invalida il vecchio refresh token
+  delete refreshTokens[refreshToken];
+
   // Recupera user dal DB per company_id!
   const result = await req.db.query('SELECT * FROM users WHERE id = $1', [userId]);
   const user = result.rows[0];
@@ -22,7 +26,11 @@ router.post('/refresh', async (req, res) => {
     process.env.JWT_SECRET,
     { expiresIn: '1h' }
   );
-  res.json({ token });
+  // Genera nuovo refresh token
+  const newRefreshToken = crypto.randomBytes(64).toString('hex');
+  refreshTokens[newRefreshToken] = user.id;
+
+  res.json({ token, refreshToken: newRefreshToken });
 });
 
 module.exports = router;

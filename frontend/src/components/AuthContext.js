@@ -12,16 +12,17 @@ export function AuthProvider({ children }) {
     setLoading(false);
   }, []);
 
-  const login = async (username, password) => {
-    const res = await axios.post(`${BACKEND_URL}/login`, { username, password });
-    localStorage.setItem("token", res.data.token);
-    setToken(res.data.token);
-  };
-
-  const logout = () => {
-    localStorage.removeItem("token");
-    setToken(null);
-  };
+ const login = async (username, password) => {
+  const res = await axios.post(`${BACKEND_URL}/login`, { username, password });
+  localStorage.setItem("token", res.data.token);
+  localStorage.setItem("refreshToken", res.data.refreshToken); // <--- aggiungi questa riga
+  setToken(res.data.token);
+};
+const logout = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("refreshToken"); // <--- aggiungi questa riga
+  setToken(null);
+};
 
   return (
     <AuthContext.Provider value={{ token, login, logout }}>

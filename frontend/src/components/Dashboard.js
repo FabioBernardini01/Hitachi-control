@@ -120,24 +120,25 @@ export default function Dashboard() {
       });
   };
 
-  // Hook per refresh automatico del token
   const refreshIntervalRef = useRef();
-  useEffect(() => {
-    async function doRefresh() {
-      if (!refreshToken) return;
-      try {
-        const res = await axios.post(`${BACKEND_URL}/refresh`, { refreshToken });
-        setToken(res.data.token);
-        if (res.data.refreshToken) setRefreshToken(res.data.refreshToken);
-        console.log("[FE] Token JWT aggiornato tramite refresh token");
-      } catch (err) {
-        console.error("[FE] Errore nel refresh del token JWT!", err);
-        logout();
-      }
+useEffect(() => {
+  async function doRefresh() {
+    if (!refreshToken) return logout();
+    try {
+      const res = await axios.post(`${BACKEND_URL}/refresh`, { refreshToken });
+      setToken(res.data.token);
+      setRefreshToken(res.data.refreshToken);
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("refreshToken", res.data.refreshToken);
+      console.log("[FE] Token JWT aggiornato tramite refresh token");
+    } catch (err) {
+      console.error("[FE] Errore nel refresh del token JWT!", err);
+      logout();
     }
-    refreshIntervalRef.current = setInterval(doRefresh, 59 * 60 * 1000);
-    return () => clearInterval(refreshIntervalRef.current);
-  }, [refreshToken, setToken, setRefreshToken, logout]);
+  }
+  refreshIntervalRef.current = setInterval(doRefresh, 50 * 1000); // ogni 50 secondi
+  return () => clearInterval(refreshIntervalRef.current);
+}, [refreshToken, setToken, setRefreshToken, logout]);
 
   // Stato stampante: logica richiesta + dettagli per tooltip
   async function fetchPrinterStatus(printer) {
