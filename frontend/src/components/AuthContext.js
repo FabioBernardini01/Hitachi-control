@@ -6,26 +6,30 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:4000"
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem("token"));
+  const [refreshToken, setRefreshToken] = useState(() => localStorage.getItem("refreshToken"));
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(false);
   }, []);
 
- const login = async (username, password) => {
-  const res = await axios.post(`${BACKEND_URL}/login`, { username, password });
-  localStorage.setItem("token", res.data.token);
-  localStorage.setItem("refreshToken", res.data.refreshToken); // <--- aggiungi questa riga
-  setToken(res.data.token);
-};
-const logout = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("refreshToken"); // <--- aggiungi questa riga
-  setToken(null);
-};
+  const login = async (username, password) => {
+    const res = await axios.post(`${BACKEND_URL}/login`, { username, password });
+    localStorage.setItem("token", res.data.token);
+    localStorage.setItem("refreshToken", res.data.refreshToken);
+    setToken(res.data.token);
+    setRefreshToken(res.data.refreshToken);
+  };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
+    setToken(null);
+    setRefreshToken(null);
+  };
 
   return (
-    <AuthContext.Provider value={{ token, login, logout }}>
+    <AuthContext.Provider value={{ token, refreshToken, setToken, setRefreshToken, login, logout }}>
       {!loading && children}
     </AuthContext.Provider>
   );

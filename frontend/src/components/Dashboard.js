@@ -120,25 +120,26 @@ export default function Dashboard() {
       });
   };
 
+  // --- REFRESH TOKEN AUTOMATICO ---
   const refreshIntervalRef = useRef();
-useEffect(() => {
-  async function doRefresh() {
-    if (!refreshToken) return logout();
-    try {
-      const res = await axios.post(`${BACKEND_URL}/refresh`, { refreshToken });
-      setToken(res.data.token);
-      setRefreshToken(res.data.refreshToken);
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("refreshToken", res.data.refreshToken);
-      console.log("[FE] Token JWT aggiornato tramite refresh token");
-    } catch (err) {
-      console.error("[FE] Errore nel refresh del token JWT!", err);
-      logout();
+  useEffect(() => {
+    async function doRefresh() {
+      if (!refreshToken) return logout();
+      try {
+        const res = await axios.post(`${BACKEND_URL}/refresh`, { refreshToken });
+        setToken(res.data.token);
+        setRefreshToken(res.data.refreshToken);
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("refreshToken", res.data.refreshToken);
+        console.log("[FE] Token JWT aggiornato tramite refresh token");
+      } catch (err) {
+        console.error("[FE] Errore nel refresh del token JWT!", err);
+        logout();
+      }
     }
-  }
-  refreshIntervalRef.current = setInterval(doRefresh, 50 * 1000); // ogni 50 secondi
-  return () => clearInterval(refreshIntervalRef.current);
-}, [refreshToken, setToken, setRefreshToken, logout]);
+    refreshIntervalRef.current = setInterval(doRefresh, 50 * 1000); // ogni 50 secondi
+    return () => clearInterval(refreshIntervalRef.current);
+  }, [refreshToken, setToken, setRefreshToken, logout]);
 
   // Stato stampante: logica richiesta + dettagli per tooltip
   async function fetchPrinterStatus(printer) {
@@ -197,7 +198,7 @@ useEffect(() => {
         reasons.push(`Inchiostro troppo basso: ${inkLevel} (input 0x0BEB)`);
       } else if (
         (typeof inkLevel === "number" && inkLevel > 2 && inkLevel <= 40) ||
-        warningRegister === 1 // <-- AGGIUNTA: warning anche se registro warning è 1
+        warningRegister === 1
       ) {
         if (status !== "red") status = "yellow";
         if (inkLevel > 2 && inkLevel <= 40) {
@@ -257,7 +258,7 @@ useEffect(() => {
     // eslint-disable-next-line
   }, [printers, token]);
 
-  // Refresh stato ogni 2 secondi
+  // Refresh stato ogni 5 secondi
   useEffect(() => {
     const interval = setInterval(() => {
       printers.forEach(printer => fetchPrinterStatus(printer));
