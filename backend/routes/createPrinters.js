@@ -10,6 +10,16 @@ router.post('/printers', authenticateJWT, async (req, res) => {
   const { name, model, ip_address, modbus_address, modbus_port, description } = req.body;
   const companyId = req.user.company_id;
 
+ // --- CONTROLLO LIMITE STAMPANTI ---
+  const companyRes = await db.query('SELECT max_devices FROM companies WHERE id = $1', [companyId]);
+  const maxDevices = companyRes.rows[0]?.max_devices || 1;
+  const printersRes = await db.query('SELECT COUNT(*) FROM printers WHERE company_id = $1', [companyId]);
+  const printersCount = parseInt(printersRes.rows[0].count, 10);
+
+  if (printersCount >= maxDevices) {
+    return res.status(400).json({ error: `Hai già raggiunto il limite massimo di devices (${maxDevices}) per questa subscription.` });
+  }
+
   // Controllo campi obbligatori
   if (!name || !ip_address || !companyId || !modbus_address || !modbus_port) {
     return res.status(400).json({ error: 'Nome, IP, modbus_address, modbus_port sono obbligatori' });

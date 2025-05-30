@@ -14,11 +14,19 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (username, password) => {
-    const res = await axios.post(`${BACKEND_URL}/login`, { username, password });
-    localStorage.setItem("token", res.data.token);
-    localStorage.setItem("refreshToken", res.data.refreshToken);
-    setToken(res.data.token);
-    setRefreshToken(res.data.refreshToken);
+    try {
+      const res = await axios.post(`${BACKEND_URL}/login`, { username, password });
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("refreshToken", res.data.refreshToken);
+      setToken(res.data.token);
+      setRefreshToken(res.data.refreshToken);
+      return { success: true };
+    } catch (err) {
+      // Prendi il messaggio e i tentativi rimasti dal backend, se presenti
+      const message = err.response?.data?.message || "Errore di login";
+      const attemptsLeft = err.response?.data?.attemptsLeft;
+      return { success: false, message, attemptsLeft };
+    }
   };
 
   const logout = () => {
@@ -29,8 +37,8 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ token, refreshToken, setToken, setRefreshToken, login, logout }}>
-      {!loading && children}
+    <AuthContext.Provider value={{ token, setToken, refreshToken, setRefreshToken, login, logout, loading }}>
+      {children}
     </AuthContext.Provider>
   );
 }

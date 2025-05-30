@@ -46,6 +46,9 @@ export default function Dashboard() {
   const [summaryPrinter, setSummaryPrinter] = useState(null);
   const [summaryKey, setSummaryKey] = useState(0);
 
+  const maxDevices = company?.max_devices || 1;
+  const canAddPrinter = printers.length < maxDevices;
+
   // Precompila i campi email quando apri la modale
   const handleOpenEmailModal = () => {
     setEmailFields({
@@ -274,32 +277,44 @@ export default function Dashboard() {
 
   // Validazione e invio aggiornamento email
   const handleUpdateEmails = async () => {
-    if (!emailFields.email1 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailFields.email1)) {
-      setEmailError("Il primo indirizzo email è obbligatorio e deve essere valido.");
-      return;
-    }
-    try {
-      await axios.post(
-        `${BACKEND_URL}/company/updateEmails`,
-        {
-          id: company.id,
-          email1: emailFields.email1,
-          email2: emailFields.email2,
-          email3: emailFields.email3,
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setCompany((prev) => ({
-        ...prev,
+  // Validazione email 1 (obbligatoria)
+  if (!emailFields.email1 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailFields.email1)) {
+    setEmailError("Il primo indirizzo email è obbligatorio e deve essere valido.");
+    return;
+  }
+  // Validazione email 2 (se presente)
+  if (emailFields.email2 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailFields.email2)) {
+    setEmailError("La seconda email non è valida.");
+    return;
+  }
+  // Validazione email 3 (se presente)
+  if (emailFields.email3 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailFields.email3)) {
+    setEmailError("La terza email non è valida.");
+    return;
+  }
+
+  try {
+    await axios.post(
+      `${BACKEND_URL}/company/updateEmails`,
+      {
+        id: company.id,
         email1: emailFields.email1,
         email2: emailFields.email2,
         email3: emailFields.email3,
-      }));
-      setShowEmailModal(false);
-    } catch (err) {
-      setEmailError("Errore durante l'aggiornamento delle email.");
-    }
-  };
+      },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    setCompany((prev) => ({
+      ...prev,
+      email1: emailFields.email1,
+      email2: emailFields.email2,
+      email3: emailFields.email3,
+    }));
+    setShowEmailModal(false);
+  } catch (err) {
+    setEmailError("Errore durante l'aggiornamento delle email.");
+  }
+};
 
   const handleAddPrinter = () => {
     if (
@@ -523,9 +538,16 @@ export default function Dashboard() {
           </div>
 
           {/* Tasto per aggiungere una stampante */}
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="mt-10 bg-blue-600 text-white p-3 rounded w-full sm:w-auto mx-auto block hover:bg-blue-700 transition"
+         <button
+            onClick={() => {
+              if (!canAddPrinter) {
+                showError(`Hai già raggiunto il limite massimo di stampanti (${maxDevices}) per questa azienda.`);
+                return;
+              }
+              setIsModalOpen(true);
+            }}
+            className={`mt-10 bg-blue-600 text-white p-3 rounded w-full sm:w-auto mx-auto block hover:bg-blue-700 transition ${!canAddPrinter ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={!canAddPrinter}
           >
             Aggiungi una stampante
           </button>
