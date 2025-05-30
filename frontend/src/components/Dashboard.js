@@ -254,19 +254,18 @@ export default function Dashboard() {
   }
 
 
-      useEffect(() => {
-        const handleUnload = () => {
-          if (token) {
-            navigator.sendBeacon(
-              `${BACKEND_URL}/logout`,
-              JSON.stringify({}),
-              { headers: { Authorization: `Bearer ${token}` } }
-            );
-          }
-        };
-        window.addEventListener('beforeunload', handleUnload);
-        return () => window.removeEventListener('beforeunload', handleUnload);
-      }, [token]);
+     useEffect(() => {
+  const handleUnload = () => {
+    if (token) {
+      navigator.sendBeacon(
+        `${BACKEND_URL}/logout?token=${token}`,
+        ""
+      );
+    }
+  };
+  window.addEventListener('beforeunload', handleUnload);
+  return () => window.removeEventListener('beforeunload', handleUnload);
+}, [token]);
 
   // Aggiorna stato stampanti ogni volta che cambia la lista
   useEffect(() => {

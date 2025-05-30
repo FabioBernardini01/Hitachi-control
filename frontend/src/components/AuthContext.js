@@ -29,13 +29,20 @@ export function AuthProvider({ children }) {
     }
   };
 
+  
  const logout = async () => {
   try {
+    // Prova prima con Authorization header (logout normale)
     await axios.post(`${BACKEND_URL}/logout`, {}, {
       headers: { Authorization: `Bearer ${token}` }
     });
   } catch (e) {
-    // Ignora errori di logout
+    // Se fallisce, prova con il token come query param (logout fallback)
+    try {
+      await axios.post(`${BACKEND_URL}/logout?token=${token}`);
+    } catch (err) {
+      // Ignora errori di logout
+    }
   }
   localStorage.removeItem("token");
   localStorage.removeItem("refreshToken");
