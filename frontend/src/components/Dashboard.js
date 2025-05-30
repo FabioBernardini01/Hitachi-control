@@ -264,7 +264,7 @@ export default function Dashboard() {
 
 useEffect(() => {
   const interval = setInterval(() => {
-    axios.post(`${BACKEND_URL}/user/update-last-seen`, {}, {
+    axios.post(`${BACKEND_URL}/update-last-seen`, {}, {
       headers: { Authorization: `Bearer ${token}` }
     }).catch(() => {});
   }, 50000);
