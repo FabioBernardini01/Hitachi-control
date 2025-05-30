@@ -15,7 +15,7 @@ router.post('/login', async (req, res) => {
     const user = result.rows[0];
 
     if (!user) {
-      return res.status(401).json({ message: 'Username o password errati' });
+      return res.status(401).json({ message: 'Username inesistente' });
     }
 
     // Controllo se utente disabilitato o bloccato
