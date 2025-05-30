@@ -8,7 +8,7 @@ router.get('/me/company', authenticateJWT, async (req, res) => {
     const userId = req.user.userId;
 
     const result = await req.db.query(`
-      SELECT c.id, c.name, c.email1, c.email2, c.email3
+      SELECT c.id, c.name, c.email1, c.email2, c.email3, c.max_devices
       FROM companies c
       JOIN users u ON u.company_id = c.id
       WHERE u.id = $1
