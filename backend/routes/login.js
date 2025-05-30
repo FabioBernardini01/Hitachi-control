@@ -62,7 +62,7 @@ router.post('/login', async (req, res) => {
     const token = jwt.sign(
       { userId: user.id, company_id: user.company_id },
       process.env.JWT_SECRET,
-      { expiresIn: '1h' }
+      { expiresIn: '1m' }
     );
     // Genera refresh token
     const refreshToken = crypto.randomBytes(64).toString('hex');
