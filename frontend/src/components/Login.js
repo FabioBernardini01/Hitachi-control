@@ -16,7 +16,7 @@ export default function Login() {
   const [attemptsLeft, setAttemptsLeft] = useState(null);
   const navigate = useNavigate();
 
-  // Cambia password state
+  // Cambia password state //
   const [showChangePwd, setShowChangePwd] = useState(false);
   const [changePwdFields, setChangePwdFields] = useState({
     username: "", oldPassword: "", newPassword: "", confirmPassword: ""
