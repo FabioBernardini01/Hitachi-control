@@ -1,22 +1,16 @@
 const bcrypt = require('bcrypt');
-const { Client } = require('pg');// filepath: /home/fabio/hitachi-control/loadEnv.js
-
-
+const { Client } = require('pg');
 
 const users = [
-  { username: 'utenteA', password: 'password', company_id: 1 },
-
-  { username: 'utenteB', password: 'password', company_id: 2 },
-  { username: 'utenteC', password: 'password', company_id: 2 },
-
-  { username: 'utenteD', password: 'password', company_id: 3 },
-  { username: 'lkj', password: 'òlkpoi098', company_id: 3 },
-
-   // AGENT USERS (uno per azienda)
-  { username: process.env.AGENT1_USERNAME, password: process.env.AGENT1_PASSWORD, company_id: 1 },
-  { username: process.env.AGENT2_USERNAME, password: process.env.AGENT2_PASSWORD, company_id: 2 },
-  { username: process.env.AGENT3_USERNAME, password: process.env.AGENT3_PASSWORD, company_id: 3 },
-
+  { username: 'utenteA', password: 'password', company_id: 1, failed_attempts: 0, locked_until: null, enabled: true },
+  { username: 'utenteB', password: 'password', company_id: 2, failed_attempts: 0, locked_until: null, enabled: true },
+  { username: 'utenteC', password: 'password', company_id: 2, failed_attempts: 0, locked_until: null, enabled: true },
+  { username: 'utenteD', password: 'password', company_id: 3, failed_attempts: 0, locked_until: null, enabled: true },
+  { username: 'lkj', password: 'òlkpoi098', company_id: 3, failed_attempts: 0, locked_until: null, enabled: true },
+  // AGENT USERS (uno per azienda)
+  { username: process.env.AGENT1_USERNAME, password: process.env.AGENT1_PASSWORD, company_id: 1, failed_attempts: 0, locked_until: null, enabled: true },
+  { username: process.env.AGENT2_USERNAME, password: process.env.AGENT2_PASSWORD, company_id: 2, failed_attempts: 0, locked_until: null, enabled: true },
+  { username: process.env.AGENT3_USERNAME, password: process.env.AGENT3_PASSWORD, company_id: 3, failed_attempts: 0, locked_until: null, enabled: true },
 ];
 
 const client = new Client({
@@ -41,8 +35,9 @@ async function insertUsers() {
 
       const hashedPassword = await bcrypt.hash(user.password, 10);
       await client.query(
-        'INSERT INTO users (username, password, company_id) VALUES ($1, $2, $3)',
-        [user.username, hashedPassword, user.company_id]
+        `INSERT INTO users (username, password, company_id, failed_attempts, locked_until, enabled)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [user.username, hashedPassword, user.company_id, user.failed_attempts, user.locked_until, user.enabled]
       );
       console.log(`Utente "${user.username}" inserito con successo.`);
     }
@@ -55,4 +50,3 @@ async function insertUsers() {
 }
 
 insertUsers();
-
