@@ -26,6 +26,9 @@ router.post('/printers', authenticateJWT, async (req, res) => {
   }
 
   try {
+
+
+  /*  
     // ⚠️ Verifica se esiste già una stampante con la stessa combinazione IP + Porta + Modbus Address
     const existing = await db.query(
       `SELECT id FROM printers 
@@ -50,6 +53,8 @@ router.post('/printers', authenticateJWT, async (req, res) => {
         error: 'Esiste già una stampante con questa combinazione di IP, porta' 
       });
     }
+*/
+    
     //CANCELLA BLOCCO SOPRA SE IP+MODBUS uguale va bene (al netto di uid differente)
 
     // 🟢 Inserisce la stampante se tutto ok

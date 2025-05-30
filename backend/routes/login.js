@@ -28,7 +28,7 @@ router.post('/login', async (req, res) => {
 
     // BLOCCO LOGIN MULTIPLO: se session_token presente, rifiuta login
     if (user.session_token) {
-      return res.status(403).json({ message: 'Sessione già attiva altrove. Effettua logout dalla precedente (se possibile) o attendi un minuto se inattiva e irrecuperabile (scheda chiusa)' });
+      return res.status(403).json({ message: 'Sessione già attiva altrove. Effettua logout dalla sessione precedente (se possibile) oppure attendi un minuto se inattiva e irrecuperabile (scheda chiusa)' });
     }
 
     const match = await bcrypt.compare(password, user.password);
