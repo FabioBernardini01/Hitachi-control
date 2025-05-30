@@ -20,7 +20,7 @@ const client = new Client({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
 });
-
+//
 async function insertUsers() {
   try {
     await client.connect();
