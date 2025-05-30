@@ -9,11 +9,6 @@ router.post('/logout', async (req, res) => {
   if (!token && req.query && req.query.token) token = req.query.token;
 
 
-    // LOG: stampa ogni chiamata alla rotta logout
-  console.log('[LOGOUT] Chiamata ricevuta. Token:', token ? token.slice(0, 20) + '...' : 'NESSUN TOKEN');
-  console.log('[LOGOUT] Headers:', req.headers);
-  console.log('[LOGOUT] Query:', req.query);
-
 
   if (!token) return res.status(401).json({ message: 'Token mancante' });
 

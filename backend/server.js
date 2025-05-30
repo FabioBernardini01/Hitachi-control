@@ -42,6 +42,8 @@ server.listen(process.env.SERVER_PORT || 4000, '0.0.0.0', () => {
 // Avvia WebSocket
 require('./ws')(server, client);
 
+// ...existing code...
+
 // --- Cleanup automatico dei comandi eseguiti/errore più vecchi di 1 minuto/5 giorni ---
 setInterval(async () => {
   try {
@@ -56,4 +58,22 @@ setInterval(async () => {
   }
 }, 60 * 1000);
 
+// --- Invalida session_token inattivi da più di 1 minuto SOLO per utenti non agent ---
+setInterval(async () => {
+  try {
+    await client.query(`
+      UPDATE users
+      SET session_token = NULL
+      WHERE session_token IS NOT NULL
+        AND (last_seen IS NULL OR last_seen < NOW() - INTERVAL '1 minute')
+        AND agent = false
+    `);
+  } catch (err) {
+    console.error('Errore invalidazione sessioni inattive:', err);
+  }
+}, 60 * 1000);
+
+// ...existing code...
+
 module.exports = { client };
+
