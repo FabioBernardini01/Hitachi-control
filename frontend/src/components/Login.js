@@ -1,39 +1,45 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
-import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'; // Importa le icone Heroicons
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
 export default function Login() {
   const { login } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [errorModal, setErrorModal] = useState(false); // Stato per la modale
-  const [passwordVisible, setPasswordVisible] = useState(false); // Stato per la visibilità della password
+  const [errorModal, setErrorModal] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [attemptsLeft, setAttemptsLeft] = useState(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      await login(username, password);
+    const result = await login(username, password);
+    if (result.success) {
       navigate("/dashboard");
-    } catch {
-      setErrorModal(true); // Mostra la modale in caso di errore
+    } else {
+      setErrorMsg(result.message);
+      setAttemptsLeft(result.attemptsLeft);
+      setErrorModal(true);
     }
   };
 
   const closeErrorModal = () => {
-    setErrorModal(false); // Chiudi la modale
+    setErrorModal(false);
+    setErrorMsg("");
+    setAttemptsLeft(null);
   };
 
   const togglePasswordVisibility = () => {
-    setPasswordVisible(!passwordVisible); // Alterna la visibilità della password
+    setPasswordVisible(!passwordVisible);
   };
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-cyan-100 px-4">
       <div className="mb-10 text-center">
         <img
-          src="/logo.png" // Percorso del file PNG nella cartella public
+          src="/logo.png"
           alt="Logo"
           className="w-64 h-64 mx-auto mb-4"
         />
@@ -53,7 +59,7 @@ export default function Login() {
         />
         <div className="relative">
           <input
-            type={passwordVisible ? "text" : "password"} // Cambia il tipo dell'input
+            type={passwordVisible ? "text" : "password"}
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -65,9 +71,9 @@ export default function Login() {
             className="absolute right-3 top-3 text-gray-500"
           >
             {passwordVisible ? (
-              <EyeSlashIcon className="w-5 h-5" /> // Usa Heroicons con dimensione ridotta
+              <EyeSlashIcon className="w-5 h-5" />
             ) : (
-              <EyeIcon className="w-5 h-5" /> // Usa Heroicons con dimensione ridotta
+              <EyeIcon className="w-5 h-5" />
             )}
           </button>
         </div>
@@ -84,7 +90,12 @@ export default function Login() {
         <div className="modal bg-black bg-opacity-50 fixed inset-0 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
             <h3 className="text-xl font-semibold mb-4 text-red-600">Errore</h3>
-            <p>Nome Utente e/o password errati</p>
+            <p>{errorMsg}</p>
+            {attemptsLeft !== undefined && attemptsLeft !== null && attemptsLeft > 0 && (
+              <p className="mt-2 text-sm text-gray-700">
+                Tentativi rimasti: <span className="font-bold">{attemptsLeft}</span>
+              </p>
+            )}
             <button
               onClick={closeErrorModal}
               className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
