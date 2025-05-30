@@ -13,6 +13,8 @@ const updateEmails = require('./updateEmails');
 const agentCommandResult = require('./agentCommandResult');
 const agentNextCommand = require('./agentNextCommand');
 const logoutRoutes = require('./logout');
+const changePasswordRoutes = require('./changePassword');
+
 
 const router = express.Router();
 
@@ -30,6 +32,7 @@ router.use(updateEmails);
 router.use(agentCommandResult);
 router.use(agentNextCommand);
 router.use(logoutRoutes);
+router.use(changePasswordRoutes);
 
 module.exports = router;
 
