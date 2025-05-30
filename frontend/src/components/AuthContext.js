@@ -20,6 +20,16 @@ export function AuthProvider({ children }) {
       localStorage.setItem("refreshToken", res.data.refreshToken);
       setToken(res.data.token);
       setRefreshToken(res.data.refreshToken);
+
+      // Aggiorna subito last_seen dopo login
+      try {
+        await axios.post(`${BACKEND_URL}/update-last-seen`, {}, {
+          headers: { Authorization: `Bearer ${res.data.token}` }
+        });
+      } catch (e) {
+        // Ignora eventuali errori di update last_seen
+      }
+
       return { success: true };
     } catch (err) {
       // Prendi il messaggio e i tentativi rimasti dal backend, se presenti
@@ -29,26 +39,25 @@ export function AuthProvider({ children }) {
     }
   };
 
-  
- const logout = async () => {
-  try {
-    // Prova prima con Authorization header (logout normale)
-    await axios.post(`${BACKEND_URL}/logout`, {}, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-  } catch (e) {
-    // Se fallisce, prova con il token come query param (logout fallback)
+  const logout = async () => {
     try {
-      await axios.post(`${BACKEND_URL}/logout?token=${token}`);
-    } catch (err) {
-      // Ignora errori di logout
+      // Prova prima con Authorization header (logout normale)
+      await axios.post(`${BACKEND_URL}/logout`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+    } catch (e) {
+      // Se fallisce, prova con il token come query param (logout fallback)
+      try {
+        await axios.post(`${BACKEND_URL}/logout?token=${token}`);
+      } catch (err) {
+        // Ignora errori di logout
+      }
     }
-  }
-  localStorage.removeItem("token");
-  localStorage.removeItem("refreshToken");
-  setToken(null);
-  setRefreshToken(null);
-};
+    localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
+    setToken(null);
+    setRefreshToken(null);
+  };
 
   return (
     <AuthContext.Provider value={{ token, setToken, refreshToken, setRefreshToken, login, logout, loading }}>
@@ -57,6 +66,6 @@ export function AuthProvider({ children }) {
   );
 }
 
-export function useAuth() {
+export function useAuth()  {
   return useContext(AuthContext);
 }
