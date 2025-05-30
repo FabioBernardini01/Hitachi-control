@@ -12,6 +12,7 @@ const refreshRoute = require('./refreshRoute');
 const updateEmails = require('./updateEmails');
 const agentCommandResult = require('./agentCommandResult');
 const agentNextCommand = require('./agentNextCommand');
+const logoutRoutes = require('./logout');
 
 const router = express.Router();
 
@@ -28,6 +29,7 @@ router.use(refreshRoute);
 router.use(updateEmails);
 router.use(agentCommandResult);
 router.use(agentNextCommand);
+router.use(logoutRoutes);
 
 module.exports = router;
 

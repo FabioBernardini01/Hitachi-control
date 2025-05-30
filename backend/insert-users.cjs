@@ -2,15 +2,15 @@ const bcrypt = require('bcrypt');
 const { Client } = require('pg');
 
 const users = [
-  { username: 'utenteA', password: 'password', company_id: 1, failed_attempts: 0, locked_until: null, enabled: true },
-  { username: 'utenteB', password: 'password', company_id: 2, failed_attempts: 0, locked_until: null, enabled: true },
-  { username: 'utenteC', password: 'password', company_id: 2, failed_attempts: 0, locked_until: null, enabled: true },
-  { username: 'utenteD', password: 'password', company_id: 3, failed_attempts: 0, locked_until: null, enabled: true },
-  { username: 'lkj', password: 'òlkpoi098', company_id: 3, failed_attempts: 0, locked_until: null, enabled: true },
+  { username: 'utenteA', password: 'password', company_id: 1, failed_attempts: 0, locked_until: null, enabled: true, session_token: null },
+  { username: 'utenteB', password: 'password', company_id: 2, failed_attempts: 0, locked_until: null, enabled: true, session_token: null },
+  { username: 'utenteC', password: 'password', company_id: 2, failed_attempts: 0, locked_until: null, enabled: true, session_token: null },
+  { username: 'utenteD', password: 'password', company_id: 3, failed_attempts: 0, locked_until: null, enabled: true, session_token: null },
+  { username: 'lkj', password: 'òlkpoi098', company_id: 3, failed_attempts: 0, locked_until: null, enabled: true, session_token: null },
   // AGENT USERS (uno per azienda)
-  { username: process.env.AGENT1_USERNAME, password: process.env.AGENT1_PASSWORD, company_id: 1, failed_attempts: 0, locked_until: null, enabled: true },
-  { username: process.env.AGENT2_USERNAME, password: process.env.AGENT2_PASSWORD, company_id: 2, failed_attempts: 0, locked_until: null, enabled: true },
-  { username: process.env.AGENT3_USERNAME, password: process.env.AGENT3_PASSWORD, company_id: 3, failed_attempts: 0, locked_until: null, enabled: true },
+  { username: process.env.AGENT1_USERNAME, password: process.env.AGENT1_PASSWORD, company_id: 1, failed_attempts: 0, locked_until: null, enabled: true, session_token: null },
+  { username: process.env.AGENT2_USERNAME, password: process.env.AGENT2_PASSWORD, company_id: 2, failed_attempts: 0, locked_until: null, enabled: true, session_token: null },
+  { username: process.env.AGENT3_USERNAME, password: process.env.AGENT3_PASSWORD, company_id: 3, failed_attempts: 0, locked_until: null, enabled: true, session_token: null },
 ];
 
 const client = new Client({

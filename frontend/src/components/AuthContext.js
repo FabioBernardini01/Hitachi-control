@@ -29,12 +29,19 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("refreshToken");
-    setToken(null);
-    setRefreshToken(null);
-  };
+ const logout = async () => {
+  try {
+    await axios.post(`${BACKEND_URL}/logout`, {}, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+  } catch (e) {
+    // Ignora errori di logout
+  }
+  localStorage.removeItem("token");
+  localStorage.removeItem("refreshToken");
+  setToken(null);
+  setRefreshToken(null);
+};
 
   return (
     <AuthContext.Provider value={{ token, setToken, refreshToken, setRefreshToken, login, logout, loading }}>

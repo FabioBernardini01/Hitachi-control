@@ -26,6 +26,11 @@ router.post('/login', async (req, res) => {
       return res.status(403).json({ message: 'Account bloccato per troppi tentativi. Riprova dopo: ' + user.locked_until });
     }
 
+    // BLOCCO LOGIN MULTIPLO: se session_token presente, rifiuta login
+    if (user.session_token) {
+      return res.status(403).json({ message: 'Sessione già attiva. Effettua il logout prima di accedere da un altro dispositivo.' });
+    }
+
     const match = await bcrypt.compare(password, user.password);
 
     if (!match) {
@@ -44,7 +49,7 @@ router.post('/login', async (req, res) => {
           'UPDATE users SET failed_attempts = $1 WHERE id = $2',
           [failedAttempts, user.id]
         );
-      return res.status(401).json({ message: `Username o password errati. Tentativi rimasti: ${5 - failedAttempts}` });
+        return res.status(401).json({ message: `Username o password errati. Tentativi rimasti: ${5 - failedAttempts}` });
       }
     }
 
@@ -62,6 +67,12 @@ router.post('/login', async (req, res) => {
     // Genera refresh token
     const refreshToken = crypto.randomBytes(64).toString('hex');
     refreshTokens[refreshToken] = user.id; // Salva in memoria (usa DB in prod)
+
+    // Salva il token attivo nel DB per l'utente
+    await req.db.query(
+      'UPDATE users SET session_token = $1 WHERE id = $2',
+      [token, user.id]
+    );
 
     return res.json({ token, refreshToken });
   } catch (error) {
