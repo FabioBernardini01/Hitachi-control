@@ -26,10 +26,41 @@ router.post('/login', async (req, res) => {
       return res.status(403).json({ message: 'Account bloccato per troppi tentativi. Riprova dopo: ' + user.locked_until });
     }
 
+    // --- LOGICA SPECIALE AGENT ---
+    if (user.agent && user.session_token) {
+      // Se è passato meno di 1 minuto dall'ultimo forced login, incrementa il contatore
+      const now = new Date();
+      let forcedCount = user.agent_login_forced_count || 0;
+      let lastForced = user.agent_login_forced_last ? new Date(user.agent_login_forced_last) : null;
+      if (lastForced && (now - lastForced) < 60 * 1000) {
+        forcedCount += 1;
+      } else {
+        forcedCount = 1;
+      }
+
+      // Se supera la soglia, disabilita l'utenza
+      if (forcedCount >= 10) {
+        await req.db.query(
+          'UPDATE users SET enabled = false, agent_login_forced_count = $1, agent_login_forced_last = $2 WHERE id = $3',
+          [forcedCount, now, user.id]
+        );
+        return res.status(403).json({ message: 'Utente agent disabilitato per troppi forced login.' });
+      }
+
+      // Aggiorna contatore e timestamp
+      await req.db.query(
+        'UPDATE users SET session_token = NULL, agent_login_forced_count = $1, agent_login_forced_last = $2 WHERE id = $3',
+        [forcedCount, now, user.id]
+      );
+      // Restituisci errore per far riloggare l'agent
+      return res.status(403).json({ message: 'Sessione agent forzatamente liberata. Riprova login.' });
+    }
+
     // BLOCCO LOGIN MULTIPLO: se session_token presente, rifiuta login
     if (user.session_token) {
       return res.status(403).json({ message: 'Sessione già attiva altrove. Effettua logout dalla sessione precedente (se possibile) oppure attendi un minuto se inattiva e irrecuperabile (scheda chiusa)' });
     }
+
 
     const match = await bcrypt.compare(password, user.password);
 
