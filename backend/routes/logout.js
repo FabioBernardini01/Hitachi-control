@@ -7,6 +7,14 @@ router.post('/logout', async (req, res) => {
   let token = req.headers.authorization?.split(' ')[1];
   if (!token && req.body && req.body.token) token = req.body.token;
   if (!token && req.query && req.query.token) token = req.query.token;
+
+
+    // LOG: stampa ogni chiamata alla rotta logout
+  console.log('[LOGOUT] Chiamata ricevuta. Token:', token ? token.slice(0, 20) + '...' : 'NESSUN TOKEN');
+  console.log('[LOGOUT] Headers:', req.headers);
+  console.log('[LOGOUT] Query:', req.query);
+
+
   if (!token) return res.status(401).json({ message: 'Token mancante' });
 
   let userId;
