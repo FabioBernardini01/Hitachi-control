@@ -15,7 +15,7 @@ function authenticateJWT(req, res, next) {
         const db = req.db || req.app.get('db');
         const result = await db.query('SELECT session_token FROM users WHERE id = $1', [user.userId]);
         if (!result.rows.length || result.rows[0].session_token !== token) {
-          return res.status(401).json({ message: 'Sessione non più valida (login effettuato o riprova fra 1 minuto)' });
+          return res.status(401).json({ message: 'Sessione non più valida (riprova fra 1 minuto)' });
         }
         // Aggiorna last_seen
         await db.query('UPDATE users SET last_seen = NOW() WHERE id = $1', [user.userId]);

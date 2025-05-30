@@ -35,9 +35,19 @@ async function insertUsers() {
 
       const hashedPassword = await bcrypt.hash(user.password, 10);
       await client.query(
-        `INSERT INTO users (username, password, company_id, failed_attempts, locked_until, enabled)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
-        [user.username, hashedPassword, user.company_id, user.failed_attempts, user.locked_until, user.enabled]
+        `INSERT INTO users (username, password, company_id, failed_attempts, locked_until, enabled, session_token, last_seen, agent)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+        [
+          user.username,
+          hashedPassword,
+          user.company_id,
+          user.failed_attempts,
+          user.locked_until,
+          user.enabled,
+          user.session_token,
+          user.last_seen,
+          user.agent
+        ]
       );
       console.log(`Utente "${user.username}" inserito con successo.`);
     }
