@@ -267,7 +267,7 @@ useEffect(() => {
     axios.post(`${BACKEND_URL}/update-last-seen`, {}, {
       headers: { Authorization: `Bearer ${token}` }
     }).catch(() => {});
-  }, 50000);
+  }, 20000);
   return () => clearInterval(interval);
 }, [token]);
 
