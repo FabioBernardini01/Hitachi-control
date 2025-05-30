@@ -27,7 +27,7 @@ async function insertCompanies() {
       }
 
       await client.query(
-        'INSERT INTO companies (name, email1, email2, email3, max_devices) VALUES ($1, $2, $3, $4, $5, $6)',
+        'INSERT INTO companies (name, email1, email2, email3, max_devices) VALUES ($1, $2, $3, $4, $5)',
         [company.name, company.email1, company.email2, company.email3, company.max_devices]
       );
       console.log(`Azienda "${company.name}" inserita con successo.`);
