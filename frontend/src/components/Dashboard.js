@@ -180,7 +180,7 @@ export default function Dashboard() {
       );
       const warningRegister = warningRes.data?.data?._values?.[0];
 
-      // --- LOGICA STATO + MOTIVI ---
+      // ---- LOGICA STATO + MOTIVI ----
       let status = "green";
       let reasons = [];
       let errorLabel = null;

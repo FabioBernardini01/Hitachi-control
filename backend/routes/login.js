@@ -26,7 +26,7 @@ router.post('/login', async (req, res) => {
       return res.status(403).json({ message: 'Account bloccato per troppi tentativi. Riprova dopo: ' + user.locked_until });
     }
 
-    // --- LOGICA SPECIALE AGENT ---
+    // ---- LOGICA SPECIALE AGENT ----
     if (user.agent && user.session_token) {
       // Se è passato meno di 1 minuto dall'ultimo forced login, incrementa il contatore
       const now = new Date();
@@ -60,7 +60,6 @@ router.post('/login', async (req, res) => {
     if (user.session_token) {
       return res.status(403).json({ message: 'Sessione già attiva altrove. Effettua logout dalla sessione precedente (se possibile) oppure attendi un minuto se inattiva e irrecuperabile (scheda chiusa)' });
     }
-
 
     const match = await bcrypt.compare(password, user.password);
 
