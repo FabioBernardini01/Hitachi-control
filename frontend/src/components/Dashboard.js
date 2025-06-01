@@ -518,36 +518,36 @@ export default function Dashboard() {
               </p>
             ) : (
               <div className="overflow-x-auto w-full">
-                 <table className="w-full bg-white shadow-md rounded-lg">
+                <table className="w-full bg-white shadow-md rounded-lg text-xs sm:text-base">
                   <thead>
                     <tr className="bg-blue-600 text-white">
-                      <th className="py-2 px-4 text-left">Nome</th>
-                      <th className="py-2 px-4 text-left">Modello</th>
-                      <th className="py-2 px-4 text-left">IP</th>
-                      <th className="py-2 px-4 text-left">UID</th>
-                      <th className="py-2 px-4 text-left">Porta</th>
-                      <th className="py-2 px-4 text-left">Descrizione</th>
-                      <th className="py-2 px-4 text-left">Stato</th>
-                      <th className="py-2 px-4 text-left">Azioni</th>
+                      <th className="py-1 px-2 sm:py-2 sm:px-4 text-left">Nome</th>
+                      <th className="py-1 px-2 sm:py-2 sm:px-4 text-left">Modello</th>
+                      <th className="py-1 px-2 sm:py-2 sm:px-4 text-left">IP</th>
+                      <th className="py-1 px-2 sm:py-2 sm:px-4 text-left">UID</th>
+                      <th className="py-1 px-2 sm:py-2 sm:px-4 text-left">Porta</th>
+                      <th className="py-1 px-2 sm:py-2 sm:px-4 text-left">Descrizione</th>
+                      <th className="py-1 px-2 sm:py-2 sm:px-4 text-left">Stato</th>
+                      <th className="py-1 px-2 sm:py-2 sm:px-4 text-left">Azioni</th>
                     </tr>
                   </thead>
                   <tbody>
                     {printers.map((printer) => (
                       <tr key={printer.id}>
-                        <td className="py-2 px-4">{printer.name}</td>
-                        <td className="py-2 px-4">{printer.model}</td>
-                        <td className="py-2 px-4">{printer.ip_address}</td>
-                        <td className="py-2 px-4">{printer.modbus_address}</td>
-                        <td className="py-2 px-4">{printer.modbus_port}</td>
-                        <td className="py-2 px-4">{printer.description}</td>
-                        <td className="py-2 px-4">
+                        <td className="py-1 px-2 sm:py-2 sm:px-4">{printer.name}</td>
+                        <td className="py-1 px-2 sm:py-2 sm:px-4">{printer.model}</td>
+                        <td className="py-1 px-2 sm:py-2 sm:px-4">{printer.ip_address}</td>
+                        <td className="py-1 px-2 sm:py-2 sm:px-4">{printer.modbus_address}</td>
+                        <td className="py-1 px-2 sm:py-2 sm:px-4">{printer.modbus_port}</td>
+                        <td className="py-1 px-2 sm:py-2 sm:px-4">{printer.description}</td>
+                        <td className="py-1 px-2 sm:py-2 sm:px-4">
                           <StatusIcon
                             status={printerStatus[printer.id]}
                             reasons={printerDetails[printer.id]?.reasons}
                             errorLabel={printerDetails[printer.id]?.errorLabel}
                           />
                         </td>
-                        <td className="py-2 px-4">
+                        <td className="py-1 px-2 sm:py-2 sm:px-4">
                           <div className="flex flex-col sm:flex-row gap-2">
                             <button
                               onClick={() => {
