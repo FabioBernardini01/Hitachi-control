@@ -39,7 +39,7 @@ router.post('/login', async (req, res) => {
       }
 
       // Se supera la soglia, disabilita l'utenza //
-      if (forcedCount >= 8) {
+      if (forcedCount >= 6) {
         await req.db.query(
           'UPDATE users SET enabled = false, agent_login_forced_count = $1, agent_login_forced_last = $2 WHERE id = $3',
           [forcedCount, now, user.id]
