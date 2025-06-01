@@ -518,7 +518,7 @@ export default function Dashboard() {
               </p>
             ) : (
               <div className="overflow-x-auto w-full">
-                <table className="min-w-[600px] w-full bg-white shadow-md rounded-lg overflow-hidden">
+                 <table className="w-full bg-white shadow-md rounded-lg">
                   <thead>
                     <tr className="bg-blue-600 text-white">
                       <th className="py-2 px-4 text-left">Nome</th>
