@@ -11,10 +11,16 @@ function authenticateJWT(req, res, next) {
         return res.status(403).json({ message: 'Token non valido' });
       }
       try {
-        // Verifica che il token sia quello attivo in DB
-        const result = await req.db.query('SELECT session_token FROM users WHERE id = $1', [user.userId]);
+        // Recupera anche il campo enabled
+        const result = await req.db.query(
+          'SELECT session_token, enabled FROM users WHERE id = $1',
+          [user.userId]
+        );
         if (!result.rows.length || result.rows[0].session_token !== token) {
           return res.status(401).json({ message: 'Sessione non più valida (riprova fra 1 minuto)' });
+        }
+        if (result.rows[0].enabled === false) {
+          return res.status(403).json({ message: 'Utente disabilitato' });
         }
         req.user = user;
         next();
