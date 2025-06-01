@@ -395,15 +395,13 @@ export default function Dashboard() {
     const iconRef = useRef();
 
     useEffect(() => {
-      function handleClickOutside(event) {
-        if (iconRef.current && !iconRef.current.contains(event.target)) {
-          setShowTooltip(false);
-        }
+      function handleEsc(e) {
+        if (e.key === "Escape") setShowTooltip(false);
       }
       if (showTooltip) {
-        document.addEventListener("mousedown", handleClickOutside);
+        document.addEventListener("keydown", handleEsc);
       }
-      return () => document.removeEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("keydown", handleEsc);
     }, [showTooltip]);
 
     let tooltip = "";
@@ -415,7 +413,6 @@ export default function Dashboard() {
       tooltip = "Tutto OK";
     }
 
-    // Icona
     const icon = (() => {
       if (status === "green") {
         return (
@@ -453,21 +450,33 @@ export default function Dashboard() {
     })();
 
     return (
-      <span ref={iconRef} className="relative">
-        <button
-          type="button"
-          onClick={() => setShowTooltip((v) => !v)}
-          className="focus:outline-none"
-          aria-label="Mostra dettagli stato"
-        >
-          {icon}
-        </button>
+      <>
+        <span ref={iconRef} className="relative">
+          <button
+            type="button"
+            onClick={() => setShowTooltip((v) => !v)}
+            className="focus:outline-none"
+            aria-label="Mostra dettagli stato"
+          >
+            {icon}
+          </button>
+        </span>
         {showTooltip && (
-          <div className="absolute z-50 left-1/2 -translate-x-1/2 mt-2 bg-white border border-gray-300 rounded shadow-lg p-2 text-xs whitespace-pre-line min-w-[180px] max-w-xs">
-            {tooltip}
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center"
+            style={{ pointerEvents: "none" }}
+          >
+            <div
+              className="bg-gray-900 text-white rounded shadow-lg p-4 text-base max-w-xs whitespace-pre-line"
+              style={{ pointerEvents: "auto" }}
+              onClick={() => setShowTooltip(false)}
+            >
+              {tooltip}
+              <div className="mt-2 text-xs text-gray-400 text-center">(clicca per chiudere)</div>
+            </div>
           </div>
         )}
-      </span>
+      </>
     );
   }
 
@@ -517,27 +526,29 @@ export default function Dashboard() {
                           />
                         </td>
                         <td className="py-2 px-4">
-                          <button
-                            onClick={() => {setSummaryPrinter(printer);
-                                setSummaryKey(Date.now()); // oppure setSummaryKey(k => k+1)
-                            }
-                            }
-                            className="bg-blue-400 text-white px-3 py-1 rounded hover:bg-blue-600 transition mr-2"
-                          >
-                            Riepilogo
-                          </button>
-                          <button
-                            onClick={() => setSelectedPrinter(printer)}
-                            className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition"
-                          >
-                            Seleziona
-                          </button>
-                          <button
-                            onClick={() => handleDelete(printer.id)}
-                            className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition ml-2"
-                          >
-                            Elimina
-                          </button>
+                          <div className="flex flex-col sm:flex-row gap-2">
+                            <button
+                              onClick={() => {
+                                setSummaryPrinter(printer);
+                                setSummaryKey(Date.now());
+                              }}
+                              className="bg-blue-400 text-white px-4 py-2 rounded w-full sm:w-auto min-w-[110px] text-base font-semibold hover:bg-blue-600 transition"
+                            >
+                              Riepilogo
+                            </button>
+                            <button
+                              onClick={() => setSelectedPrinter(printer)}
+                              className="bg-green-500 text-white px-4 py-2 rounded w-full sm:w-auto min-w-[110px] text-base font-semibold hover:bg-green-600 transition"
+                            >
+                              Seleziona
+                            </button>
+                            <button
+                              onClick={() => handleDelete(printer.id)}
+                              className="bg-red-500 text-white px-4 py-2 rounded w-full sm:w-auto min-w-[110px] text-base font-semibold hover:bg-red-600 transition"
+                            >
+                              Elimina
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -581,7 +592,7 @@ export default function Dashboard() {
               }
               setIsModalOpen(true);
             }}
-            className={`mt-10 bg-blue-600 text-white p-3 rounded w-full sm:w-auto mx-auto block hover:bg-blue-700 transition ${!canAddPrinter ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`mt-10 bg-blue-600 text-white p-3 rounded w-full sm:w-auto mx-auto block hover:bg-blue-700 transition text-base font-semibold`}
             disabled={!canAddPrinter}
           >
             Aggiungi una stampante
@@ -591,13 +602,13 @@ export default function Dashboard() {
           <div className="text-center mt-4 flex flex-col sm:flex-row justify-center gap-2">
             <button
               onClick={logout}
-              className="bg-red-500 text-white p-3 rounded hover:bg-red-600 transition"
+              className="bg-red-500 text-white p-3 rounded w-full sm:w-auto text-base font-semibold hover:bg-red-600 transition"
             >
               Logout
             </button>
             <button
               onClick={handleOpenEmailModal}
-              className="bg-yellow-400 text-gray-900 p-3 rounded hover:bg-yellow-500 transition font-semibold ml-2"
+              className="bg-yellow-400 text-gray-900 p-3 rounded w-full sm:w-auto text-base font-semibold hover:bg-yellow-500 transition ml-0 sm:ml-2"
             >
               Aggiorna email
             </button>
