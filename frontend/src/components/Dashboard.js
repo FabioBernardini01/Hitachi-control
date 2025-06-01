@@ -607,35 +607,35 @@ export default function Dashboard() {
 
           {/* Tasto per aggiungere una stampante */}
          <button
-            onClick={() => {
-              if (!canAddPrinter) {
-                showError(`Hai già raggiunto il limite massimo di stampanti (${maxDevices}) per questa azienda.`);
-                return;
-              }
-              setIsModalOpen(true);
-            }}
-            className="mt-10 bg-blue-600 text-white w-full sm:w-auto min-w-[140px] px-4 py-3 text-base font-semibold rounded mx-auto block hover:bg-blue-700 transition"
-            disabled={!canAddPrinter}
-          >
-            Aggiungi una stampante
-          </button>
+                  onClick={() => {
+                    if (!canAddPrinter) {
+                      showError(`Hai già raggiunto il limite massimo di stampanti (${maxDevices}) per questa azienda.`);
+                      return;
+                    }
+                    setIsModalOpen(true);
+                  }}
+                  className="mt-10 bg-blue-600 text-white min-w-[140px] px-4 py-3 text-base font-semibold rounded mx-auto block hover:bg-blue-700 transition"
+                  disabled={!canAddPrinter}
+                >
+                  Aggiungi una stampante
+                </button>
 
           {/* Tasti Logout e Aggiorna email */}
-          <div className="text-center mt-4 flex flex-col sm:flex-row justify-center gap-2">
-            <button
-              onClick={logout}
-              className="bg-red-500 text-white w-full sm:w-auto min-w-[140px] px-4 py-3 text-base font-semibold rounded hover:bg-red-600 transition"
-            >
-              Logout
-            </button>
-            <button
-              onClick={handleOpenEmailModal}
-              className="bg-yellow-400 text-gray-900 w-full sm:w-auto min-w-[140px] px-4 py-3 text-base font-semibold rounded hover:bg-yellow-500 transition ml-0 sm:ml-2"
-            >
-              Aggiorna email
-            </button>
-          </div>
-        </>
+               <div className="text-center mt-4 flex flex-row flex-wrap justify-center gap-2">
+                  <button
+                    onClick={logout}
+                    className="bg-red-500 text-white min-w-[140px] px-4 py-3 text-base font-semibold rounded hover:bg-red-600 transition"
+                  >
+                    Logout
+                  </button>
+                  <button
+                    onClick={handleOpenEmailModal}
+                    className="bg-yellow-400 text-gray-900 min-w-[140px] px-4 py-3 text-base font-semibold rounded hover:bg-yellow-500 transition ml-0 sm:ml-2"
+                  >
+                    Aggiorna email
+                  </button>
+                </div>
+             </>
       ) : (
         <div className="text-center">Caricamento...</div>
       )}
