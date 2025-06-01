@@ -390,9 +390,7 @@ export default function Dashboard() {
 
   // --- ICON COMPONENTS ---
   function StatusIcon({ status, reasons, errorLabel }) {
-    // Tooltip: se errore, mostra la label dell'errore, altrimenti motivi
     const [showTooltip, setShowTooltip] = useState(false);
-    const iconRef = useRef();
 
     useEffect(() => {
       function handleEsc(e) {
@@ -451,27 +449,23 @@ export default function Dashboard() {
 
     return (
       <>
-        <span ref={iconRef} className="relative">
-          <button
-            type="button"
-            onClick={() => setShowTooltip((v) => !v)}
-            className="focus:outline-none"
-            aria-label="Mostra dettagli stato"
-          >
-            {icon}
-          </button>
-        </span>
+        <button
+          type="button"
+          onClick={() => setShowTooltip((v) => !v)}
+          className="focus:outline-none"
+          aria-label="Mostra dettagli stato"
+        >
+          {icon}
+        </button>
         {showTooltip && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center"
-            style={{ pointerEvents: "none" }}
-          >
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
             <div
-              className="bg-gray-900 text-white rounded shadow-lg p-4 text-base max-w-xs whitespace-pre-line"
-              style={{ pointerEvents: "auto" }}
+              className="bg-gray-900 text-white rounded-lg shadow-lg p-4 max-w-xs w-[90vw] break-words text-base"
               onClick={() => setShowTooltip(false)}
+              role="dialog"
+              tabIndex={-1}
             >
-              {tooltip}
+              <span className="whitespace-pre-line">{tooltip}</span>
               <div className="mt-2 text-xs text-gray-400 text-center">(clicca per chiudere)</div>
             </div>
           </div>
@@ -532,19 +526,19 @@ export default function Dashboard() {
                                 setSummaryPrinter(printer);
                                 setSummaryKey(Date.now());
                               }}
-                              className="bg-blue-400 text-white px-4 py-2 rounded w-full sm:w-auto min-w-[110px] text-base font-semibold hover:bg-blue-600 transition"
+                              className="bg-blue-400 text-white w-full sm:w-auto min-w-[140px] px-4 py-3 text-base font-semibold rounded hover:bg-blue-600 transition"
                             >
                               Riepilogo
                             </button>
                             <button
                               onClick={() => setSelectedPrinter(printer)}
-                              className="bg-green-500 text-white px-4 py-2 rounded w-full sm:w-auto min-w-[110px] text-base font-semibold hover:bg-green-600 transition"
+                              className="bg-green-500 text-white w-full sm:w-auto min-w-[140px] px-4 py-3 text-base font-semibold rounded hover:bg-green-600 transition"
                             >
                               Seleziona
                             </button>
                             <button
                               onClick={() => handleDelete(printer.id)}
-                              className="bg-red-500 text-white px-4 py-2 rounded w-full sm:w-auto min-w-[110px] text-base font-semibold hover:bg-red-600 transition"
+                              className="bg-red-500 text-white w-full sm:w-auto min-w-[140px] px-4 py-3 text-base font-semibold rounded hover:bg-red-600 transition"
                             >
                               Elimina
                             </button>
@@ -592,7 +586,7 @@ export default function Dashboard() {
               }
               setIsModalOpen(true);
             }}
-            className={`mt-10 bg-blue-600 text-white p-3 rounded w-full sm:w-auto mx-auto block hover:bg-blue-700 transition text-base font-semibold`}
+            className="mt-10 bg-blue-600 text-white w-full sm:w-auto min-w-[140px] px-4 py-3 text-base font-semibold rounded mx-auto block hover:bg-blue-700 transition"
             disabled={!canAddPrinter}
           >
             Aggiungi una stampante
@@ -602,13 +596,13 @@ export default function Dashboard() {
           <div className="text-center mt-4 flex flex-col sm:flex-row justify-center gap-2">
             <button
               onClick={logout}
-              className="bg-red-500 text-white p-3 rounded w-full sm:w-auto text-base font-semibold hover:bg-red-600 transition"
+              className="bg-red-500 text-white w-full sm:w-auto min-w-[140px] px-4 py-3 text-base font-semibold rounded hover:bg-red-600 transition"
             >
               Logout
             </button>
             <button
               onClick={handleOpenEmailModal}
-              className="bg-yellow-400 text-gray-900 p-3 rounded w-full sm:w-auto text-base font-semibold hover:bg-yellow-500 transition ml-0 sm:ml-2"
+              className="bg-yellow-400 text-gray-900 w-full sm:w-auto min-w-[140px] px-4 py-3 text-base font-semibold rounded hover:bg-yellow-500 transition ml-0 sm:ml-2"
             >
               Aggiorna email
             </button>
