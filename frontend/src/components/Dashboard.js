@@ -253,7 +253,6 @@ export default function Dashboard() {
     }
   }
 
-
   // Aggiorna stato stampanti ogni volta che cambia la lista
   useEffect(() => {
     if (printers.length > 0) {
@@ -262,14 +261,14 @@ export default function Dashboard() {
     // eslint-disable-next-line
   }, [printers, token]);
 
-useEffect(() => {
-  const interval = setInterval(() => {
-    axios.post(`${BACKEND_URL}/update-last-seen`, {}, {
-      headers: { Authorization: `Bearer ${token}` }
-    }).catch(() => {});
-  }, 20000);
-  return () => clearInterval(interval);
-}, [token]);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      axios.post(`${BACKEND_URL}/update-last-seen`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      }).catch(() => {});
+    }, 20000);
+    return () => clearInterval(interval);
+  }, [token]);
 
   // Refresh stato ogni 5 secondi
   useEffect(() => {
@@ -287,44 +286,44 @@ useEffect(() => {
 
   // Validazione e invio aggiornamento email
   const handleUpdateEmails = async () => {
-  // Validazione email 1 (obbligatoria)
-  if (!emailFields.email1 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailFields.email1)) {
-    setEmailError("Il primo indirizzo email è obbligatorio e deve essere valido.");
-    return;
-  }
-  // Validazione email 2 (se presente)
-  if (emailFields.email2 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailFields.email2)) {
-    setEmailError("La seconda email non è valida.");
-    return;
-  }
-  // Validazione email 3 (se presente)
-  if (emailFields.email3 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailFields.email3)) {
-    setEmailError("La terza email non è valida.");
-    return;
-  }
+    // Validazione email 1 (obbligatoria)
+    if (!emailFields.email1 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailFields.email1)) {
+      setEmailError("Il primo indirizzo email è obbligatorio e deve essere valido.");
+      return;
+    }
+    // Validazione email 2 (se presente)
+    if (emailFields.email2 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailFields.email2)) {
+      setEmailError("La seconda email non è valida.");
+      return;
+    }
+    // Validazione email 3 (se presente)
+    if (emailFields.email3 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailFields.email3)) {
+      setEmailError("La terza email non è valida.");
+      return;
+    }
 
-  try {
-    await axios.post(
-      `${BACKEND_URL}/company/updateEmails`,
-      {
-        id: company.id,
+    try {
+      await axios.post(
+        `${BACKEND_URL}/company/updateEmails`,
+        {
+          id: company.id,
+          email1: emailFields.email1,
+          email2: emailFields.email2,
+          email3: emailFields.email3,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setCompany((prev) => ({
+        ...prev,
         email1: emailFields.email1,
         email2: emailFields.email2,
         email3: emailFields.email3,
-      },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    setCompany((prev) => ({
-      ...prev,
-      email1: emailFields.email1,
-      email2: emailFields.email2,
-      email3: emailFields.email3,
-    }));
-    setShowEmailModal(false);
-  } catch (err) {
-    setEmailError("Errore durante l'aggiornamento delle email.");
-  }
-};
+      }));
+      setShowEmailModal(false);
+    } catch (err) {
+      setEmailError("Errore durante l'aggiornamento delle email.");
+    }
+  };
 
   const handleAddPrinter = () => {
     if (
@@ -392,6 +391,21 @@ useEffect(() => {
   // --- ICON COMPONENTS ---
   function StatusIcon({ status, reasons, errorLabel }) {
     // Tooltip: se errore, mostra la label dell'errore, altrimenti motivi
+    const [showTooltip, setShowTooltip] = useState(false);
+    const iconRef = useRef();
+
+    useEffect(() => {
+      function handleClickOutside(event) {
+        if (iconRef.current && !iconRef.current.contains(event.target)) {
+          setShowTooltip(false);
+        }
+      }
+      if (showTooltip) {
+        document.addEventListener("mousedown", handleClickOutside);
+      }
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [showTooltip]);
+
     let tooltip = "";
     if (status === "red" && errorLabel) {
       tooltip = errorLabel;
@@ -401,55 +415,64 @@ useEffect(() => {
       tooltip = "Tutto OK";
     }
 
-    if (status === "green") {
-      return (
-        <span
-          title={tooltip}
-          className="inline-flex items-center justify-center rounded-lg bg-green-500 w-7 h-7"
-          style={{ display: "inline-flex", verticalAlign: "middle", cursor: "pointer" }}
+    // Icona
+    const icon = (() => {
+      if (status === "green") {
+        return (
+          <span className="inline-flex items-center justify-center rounded-lg bg-green-500 w-7 h-7">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <rect width="20" height="20" rx="6" fill="#22c55e" />
+              <path d="M6 10.5L9 13.5L14 7.5" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </span>
+        );
+      }
+      if (status === "yellow") {
+        return (
+          <span className="inline-flex items-center justify-center">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <polygon points="14,4 26,24 2,24" fill="#facc15" stroke="#fbbf24" strokeWidth="2"/>
+              <rect x="13" y="11" width="2" height="6" rx="1" fill="#1f2937"/>
+              <rect x="13" y="19" width="2" height="2" rx="1" fill="#1f2937"/>
+            </svg>
+          </span>
+        );
+      }
+      if (status === "red") {
+        return (
+          <span className="inline-flex items-center justify-center">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <polygon points="14,4 26,24 2,24" fill="#ef4444" stroke="#b91c1c" strokeWidth="2"/>
+              <rect x="13" y="11" width="2" height="6" rx="1" fill="#fff"/>
+              <rect x="13" y="19" width="2" height="2" rx="1" fill="#fff"/>
+            </svg>
+          </span>
+        );
+      }
+      return null;
+    })();
+
+    return (
+      <span ref={iconRef} className="relative">
+        <button
+          type="button"
+          onClick={() => setShowTooltip((v) => !v)}
+          className="focus:outline-none"
+          aria-label="Mostra dettagli stato"
         >
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <rect width="20" height="20" rx="6" fill="#22c55e" />
-            <path d="M6 10.5L9 13.5L14 7.5" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </span>
-      );
-    }
-    if (status === "yellow") {
-      return (
-        <span
-          title={tooltip}
-          className="inline-flex items-center justify-center"
-          style={{ cursor: "pointer" }}
-        >
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-            <polygon points="14,4 26,24 2,24" fill="#facc15" stroke="#fbbf24" strokeWidth="2"/>
-            <rect x="13" y="11" width="2" height="6" rx="1" fill="#1f2937"/>
-            <rect x="13" y="19" width="2" height="2" rx="1" fill="#1f2937"/>
-          </svg>
-        </span>
-      );
-    }
-    if (status === "red") {
-      return (
-        <span
-          title={tooltip}
-          className="inline-flex items-center justify-center"
-          style={{ cursor: "pointer" }}
-        >
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-            <polygon points="14,4 26,24 2,24" fill="#ef4444" stroke="#b91c1c" strokeWidth="2"/>
-            <rect x="13" y="11" width="2" height="6" rx="1" fill="#fff"/>
-            <rect x="13" y="19" width="2" height="2" rx="1" fill="#fff"/>
-          </svg>
-        </span>
-      );
-    }
-    return null;
+          {icon}
+        </button>
+        {showTooltip && (
+          <div className="absolute z-50 left-1/2 -translate-x-1/2 mt-2 bg-white border border-gray-300 rounded shadow-lg p-2 text-xs whitespace-pre-line min-w-[180px] max-w-xs">
+            {tooltip}
+          </div>
+        )}
+      </span>
+    );
   }
 
   return (
-    <div className="p-6 bg-cyan-100 min-h-screen">
+    <div className="p-2 sm:p-6 bg-cyan-100 min-h-screen w-full max-w-full">
       {company ? (
         <>
           <div className="text-center mb-6">
@@ -463,72 +486,74 @@ useEffect(() => {
                 Nessuna stampante disponibile per questa azienda.
               </p>
             ) : (
-              <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
-                <thead>
-                  <tr className="bg-blue-600 text-white">
-                    <th className="py-2 px-4 text-left">Nome</th>
-                    <th className="py-2 px-4 text-left">Modello</th>
-                    <th className="py-2 px-4 text-left">IP</th>
-                    <th className="py-2 px-4 text-left">UID</th>
-                    <th className="py-2 px-4 text-left">Porta</th>
-                    <th className="py-2 px-4 text-left">Descrizione</th>
-                    <th className="py-2 px-4 text-left">Stato</th>
-                    <th className="py-2 px-4 text-left">Azioni</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {printers.map((printer) => (
-                    <tr key={printer.id}>
-                      <td className="py-2 px-4">{printer.name}</td>
-                      <td className="py-2 px-4">{printer.model}</td>
-                      <td className="py-2 px-4">{printer.ip_address}</td>
-                      <td className="py-2 px-4">{printer.modbus_address}</td>
-                      <td className="py-2 px-4">{printer.modbus_port}</td>
-                      <td className="py-2 px-4">{printer.description}</td>
-                      <td className="py-2 px-4">
-                        <StatusIcon
-                          status={printerStatus[printer.id]}
-                          reasons={printerDetails[printer.id]?.reasons}
-                          errorLabel={printerDetails[printer.id]?.errorLabel}
-                        />
-                      </td>
-                      <td className="py-2 px-4">
-                        <button
-                          onClick={() => {setSummaryPrinter(printer);
-                              setSummaryKey(Date.now()); // oppure setSummaryKey(k => k+1)
-                          }
-                          }
-                          className="bg-blue-400 text-white px-3 py-1 rounded hover:bg-blue-600 transition mr-2"
-                        >
-                          Riepilogo
-                        </button>
-                        <button
-                          onClick={() => setSelectedPrinter(printer)}
-                          className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition"
-                        >
-                          Seleziona
-                        </button>
-                        <button
-                          onClick={() => handleDelete(printer.id)}
-                          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition ml-2"
-                        >
-                          Elimina
-                        </button>
-                      </td>
+              <div className="overflow-x-auto w-full">
+                <table className="min-w-[600px] w-full bg-white shadow-md rounded-lg overflow-hidden">
+                  <thead>
+                    <tr className="bg-blue-600 text-white">
+                      <th className="py-2 px-4 text-left">Nome</th>
+                      <th className="py-2 px-4 text-left">Modello</th>
+                      <th className="py-2 px-4 text-left">IP</th>
+                      <th className="py-2 px-4 text-left">UID</th>
+                      <th className="py-2 px-4 text-left">Porta</th>
+                      <th className="py-2 px-4 text-left">Descrizione</th>
+                      <th className="py-2 px-4 text-left">Stato</th>
+                      <th className="py-2 px-4 text-left">Azioni</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {printers.map((printer) => (
+                      <tr key={printer.id}>
+                        <td className="py-2 px-4">{printer.name}</td>
+                        <td className="py-2 px-4">{printer.model}</td>
+                        <td className="py-2 px-4">{printer.ip_address}</td>
+                        <td className="py-2 px-4">{printer.modbus_address}</td>
+                        <td className="py-2 px-4">{printer.modbus_port}</td>
+                        <td className="py-2 px-4">{printer.description}</td>
+                        <td className="py-2 px-4">
+                          <StatusIcon
+                            status={printerStatus[printer.id]}
+                            reasons={printerDetails[printer.id]?.reasons}
+                            errorLabel={printerDetails[printer.id]?.errorLabel}
+                          />
+                        </td>
+                        <td className="py-2 px-4">
+                          <button
+                            onClick={() => {setSummaryPrinter(printer);
+                                setSummaryKey(Date.now()); // oppure setSummaryKey(k => k+1)
+                            }
+                            }
+                            className="bg-blue-400 text-white px-3 py-1 rounded hover:bg-blue-600 transition mr-2"
+                          >
+                            Riepilogo
+                          </button>
+                          <button
+                            onClick={() => setSelectedPrinter(printer)}
+                            className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition"
+                          >
+                            Seleziona
+                          </button>
+                          <button
+                            onClick={() => handleDelete(printer.id)}
+                            className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition ml-2"
+                          >
+                            Elimina
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
-              {summaryPrinter && (
-                    <Summary
-                      key={summaryKey}
-                      printer={summaryPrinter}
-                      token={token}
-                      onClose={() => setSummaryPrinter(null)}
-                    />
-                  )}
+          {summaryPrinter && (
+            <Summary
+              key={summaryKey}
+              printer={summaryPrinter}
+              token={token}
+              onClose={() => setSummaryPrinter(null)}
+            />
+          )}
           {/* Sezione per leggere i registri Modbus */}
           <div className="mt-10">
             {selectedPrinter ? (
@@ -563,7 +588,7 @@ useEffect(() => {
           </button>
 
           {/* Tasti Logout e Aggiorna email */}
-          <div className="text-center mt-4 flex justify-center gap-2">
+          <div className="text-center mt-4 flex flex-col sm:flex-row justify-center gap-2">
             <button
               onClick={logout}
               className="bg-red-500 text-white p-3 rounded hover:bg-red-600 transition"
