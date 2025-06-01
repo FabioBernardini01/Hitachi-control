@@ -387,10 +387,11 @@ export default function Dashboard() {
     setIsModalOpen(false);
     clearError();
   };
-
   // --- ICON COMPONENTS ---
   function StatusIcon({ status, reasons, errorLabel }) {
     const [showTooltip, setShowTooltip] = useState(false);
+    const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
+    const btnRef = useRef();
 
     useEffect(() => {
       function handleEsc(e) {
@@ -401,6 +402,21 @@ export default function Dashboard() {
       }
       return () => document.removeEventListener("keydown", handleEsc);
     }, [showTooltip]);
+
+    // Calcola posizione tooltip al click
+    function handleClick(e) {
+      // Preferisci clientX/clientY (posizione mouse), fallback su bounding rect
+      let x = e.clientX;
+      let y = e.clientY;
+      // Se non disponibile (es touch), usa bounding rect del bottone
+      if ((!x && !y) && btnRef.current) {
+        const rect = btnRef.current.getBoundingClientRect();
+        x = rect.left + rect.width / 2;
+        y = rect.top + rect.height / 2;
+      }
+      setTooltipPos({ x, y });
+      setShowTooltip((v) => !v);
+    }
 
     let tooltip = "";
     if (status === "red" && errorLabel) {
@@ -447,21 +463,33 @@ export default function Dashboard() {
       return null;
     })();
 
+    // Tooltip posizionato dove c'è il mouse/click, con fallback se va fuori dallo schermo
     return (
       <>
         <button
+          ref={btnRef}
           type="button"
-          onClick={() => setShowTooltip((v) => !v)}
+          onClick={handleClick}
           className="focus:outline-none"
           aria-label="Mostra dettagli stato"
         >
           {icon}
         </button>
         {showTooltip && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div
+            className="fixed inset-0 z-50"
+            style={{ pointerEvents: "none" }}
+            onClick={() => setShowTooltip(false)}
+          >
             <div
-              className="bg-gray-900 text-white rounded-lg shadow-lg p-4 max-w-xs w-[90vw] break-words text-base"
-              onClick={() => setShowTooltip(false)}
+              className="absolute bg-gray-900 text-white rounded-lg shadow-lg p-4 max-w-xs w-[90vw] break-words text-base"
+              style={{
+                left: Math.min(tooltipPos.x, window.innerWidth - 260),
+                top: Math.min(tooltipPos.y, window.innerHeight - 120),
+                pointerEvents: "auto",
+                zIndex: 100
+              }}
+              onClick={e => { e.stopPropagation(); setShowTooltip(false); }}
               role="dialog"
               tabIndex={-1}
             >
