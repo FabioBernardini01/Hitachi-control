@@ -389,118 +389,116 @@ export default function Dashboard() {
   };
   // --- ICON COMPONENTS ---
   function StatusIcon({ status, reasons, errorLabel }) {
-    const [showTooltip, setShowTooltip] = useState(false);
-    const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
-    const btnRef = useRef();
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
+  const btnRef = useRef();
 
-    useEffect(() => {
-      function handleEsc(e) {
-        if (e.key === "Escape") setShowTooltip(false);
-      }
-      if (showTooltip) {
-        document.addEventListener("keydown", handleEsc);
-      }
-      return () => document.removeEventListener("keydown", handleEsc);
-    }, [showTooltip]);
-
-    // Calcola posizione tooltip al click
-    function handleClick(e) {
-      // Preferisci clientX/clientY (posizione mouse), fallback su bounding rect
-      let x = e.clientX;
-      let y = e.clientY;
-      // Se non disponibile (es touch), usa bounding rect del bottone
-      if ((!x && !y) && btnRef.current) {
-        const rect = btnRef.current.getBoundingClientRect();
-        x = rect.left + rect.width / 2;
-        y = rect.top + rect.height / 2;
-      }
-      setTooltipPos({ x, y });
-      setShowTooltip((v) => !v);
+  useEffect(() => {
+    function handleEsc(e) {
+      if (e.key === "Escape") setShowTooltip(false);
     }
-
-    let tooltip = "";
-    if (status === "red" && errorLabel) {
-      tooltip = errorLabel;
-    } else if (reasons && reasons.length > 0) {
-      tooltip = reasons.join("\n");
-    } else {
-      tooltip = "Tutto OK";
+    if (showTooltip) {
+      document.addEventListener("keydown", handleEsc);
     }
+    return () => document.removeEventListener("keydown", handleEsc);
+  }, [showTooltip]);
 
-    const icon = (() => {
-      if (status === "green") {
-        return (
-          <span className="inline-flex items-center justify-center rounded-lg bg-green-500 w-7 h-7">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <rect width="20" height="20" rx="6" fill="#22c55e" />
-              <path d="M6 10.5L9 13.5L14 7.5" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </span>
-        );
-      }
-      if (status === "yellow") {
-        return (
-          <span className="inline-flex items-center justify-center">
-            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-              <polygon points="14,4 26,24 2,24" fill="#facc15" stroke="#fbbf24" strokeWidth="2"/>
-              <rect x="13" y="11" width="2" height="6" rx="1" fill="#1f2937"/>
-              <rect x="13" y="19" width="2" height="2" rx="1" fill="#1f2937"/>
-            </svg>
-          </span>
-        );
-      }
-      if (status === "red") {
-        return (
-          <span className="inline-flex items-center justify-center">
-            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-              <polygon points="14,4 26,24 2,24" fill="#ef4444" stroke="#b91c1c" strokeWidth="2"/>
-              <rect x="13" y="11" width="2" height="6" rx="1" fill="#fff"/>
-              <rect x="13" y="19" width="2" height="2" rx="1" fill="#fff"/>
-            </svg>
-          </span>
-        );
-      }
-      return null;
-    })();
-
-    // Tooltip posizionato dove c'è il mouse/click, con fallback se va fuori dallo schermo
-    return (
-      <>
-        <button
-          ref={btnRef}
-          type="button"
-          onClick={handleClick}
-          className="focus:outline-none"
-          aria-label="Mostra dettagli stato"
-        >
-          {icon}
-        </button>
-        {showTooltip && (
-          <div
-            className="fixed inset-0 z-50"
-            style={{ pointerEvents: "none" }}
-            onClick={() => setShowTooltip(false)}
-          >
-            <div
-              className="absolute bg-gray-900 text-white rounded-lg shadow-lg p-4 max-w-xs w-[90vw] break-words text-base"
-              style={{
-                left: Math.min(tooltipPos.x, window.innerWidth - 260),
-                top: Math.min(tooltipPos.y, window.innerHeight - 120),
-                pointerEvents: "auto",
-                zIndex: 100
-              }}
-              onClick={e => { e.stopPropagation(); setShowTooltip(false); }}
-              role="dialog"
-              tabIndex={-1}
-            >
-              <span className="whitespace-pre-line">{tooltip}</span>
-              <div className="mt-2 text-xs text-gray-400 text-center">(clicca per chiudere)</div>
-            </div>
-          </div>
-        )}
-      </>
-    );
+  // Calcola posizione tooltip al click
+  function handleClick(e) {
+    let x = e.clientX;
+    let y = e.clientY;
+    if ((!x && !y) && btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect();
+      x = rect.left + rect.width / 2;
+      y = rect.top + rect.height / 2;
+    }
+    setTooltipPos({ x, y });
+    setShowTooltip((v) => !v);
   }
+
+  let tooltip = "";
+  if (status === "red" && errorLabel) {
+    tooltip = errorLabel;
+  } else if (reasons && reasons.length > 0) {
+    tooltip = reasons.join("\n");
+  } else {
+    tooltip = "Tutto OK";
+  }
+
+  const icon = (() => {
+    if (status === "green") {
+      return (
+        <span className="inline-flex items-center justify-center rounded-lg bg-green-500 w-7 h-7">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <rect width="20" height="20" rx="6" fill="#22c55e" />
+            <path d="M6 10.5L9 13.5L14 7.5" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </span>
+      );
+    }
+    if (status === "yellow") {
+      return (
+        <span className="inline-flex items-center justify-center">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <polygon points="14,4 26,24 2,24" fill="#facc15" stroke="#fbbf24" strokeWidth="2"/>
+            <rect x="13" y="11" width="2" height="6" rx="1" fill="#1f2937"/>
+            <rect x="13" y="19" width="2" height="2" rx="1" fill="#1f2937"/>
+          </svg>
+        </span>
+      );
+    }
+    if (status === "red") {
+      return (
+        <span className="inline-flex items-center justify-center">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <polygon points="14,4 26,24 2,24" fill="#ef4444" stroke="#b91c1c" strokeWidth="2"/>
+            <rect x="13" y="11" width="2" height="6" rx="1" fill="#fff"/>
+            <rect x="13" y="19" width="2" height="2" rx="1" fill="#fff"/>
+          </svg>
+        </span>
+      );
+    }
+    return null;
+  })();
+
+  // Tooltip posizionato dove c'è il mouse/click, con fallback se va fuori dallo schermo
+  return (
+    <>
+      <button
+        ref={btnRef}
+        type="button"
+        onClick={handleClick}
+        className="focus:outline-none"
+        aria-label="Mostra dettagli stato"
+      >
+        {icon}
+      </button>
+      {showTooltip && (
+        <div
+          className="fixed inset-0 z-50"
+          style={{ pointerEvents: "auto" }}
+          onClick={() => setShowTooltip(false)}
+        >
+          <div
+            className="absolute bg-gray-900 text-white rounded-lg shadow-lg p-4 max-w-xs w-[90vw] break-words text-base"
+            style={{
+              left: Math.min(tooltipPos.x, window.innerWidth - 260),
+              top: Math.min(tooltipPos.y, window.innerHeight - 120),
+              pointerEvents: "auto",
+              zIndex: 100
+            }}
+            onClick={e => { e.stopPropagation(); }}
+            role="dialog"
+            tabIndex={-1}
+          >
+            <span className="whitespace-pre-line">{tooltip}</span>
+            <div className="mt-2 text-xs text-gray-400 text-center">(clicca ovunque per chiudere)</div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
 
   return (
     <div className="p-2 sm:p-6 bg-cyan-100 min-h-screen w-full max-w-full text-[11px] sm:text-base">
