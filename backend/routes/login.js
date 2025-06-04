@@ -89,8 +89,13 @@ router.post('/login', async (req, res) => {
       [user.id]
     );
 
-    const token = jwt.sign(
-      { userId: user.id, company_id: user.company_id },
+
+const token = jwt.sign(
+      {
+        userId: user.id,
+        company_id: user.company_id,
+        jti: crypto.randomBytes(16).toString('hex') // JWT ID unico per ogni login
+      },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
