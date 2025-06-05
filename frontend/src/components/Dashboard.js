@@ -350,11 +350,30 @@ export default function Dashboard() {
       showError("Inserisci un indirizzo IP valido (es. 192.168.1.100)");
       return;
     }
-
      if (isDuplicateIPPort(newPrinterDetails.location.trim(), newPrinterModbusPort.trim())) {
     showError("Esiste già una stampante con questa combinazione di IP e porta.");
     return;
-  }
+    }
+    if (newPrinterName.length > 20) {
+      showError("Il nome stampante non può superare 20 caratteri.");
+      return;
+    }
+    if (newPrinterDetails.model.length > 40) {
+      showError("Il modello non può superare 40 caratteri.");
+      return;
+    }
+    if (newPrinterDescription.length > 80) {
+      showError("La descrizione non può superare 80 caratteri.");
+      return;
+    }
+    if (!/^\d+$/.test(newPrinterModbusAddress)) {
+      showError("L'indirizzo Modbus deve essere un numero.");
+      return;
+    }
+    if (!/^\d+$/.test(newPrinterModbusPort)) {
+      showError("La porta Modbus deve essere un numero.");
+      return;
+    }
 
     const newPrinter = {
       name: newPrinterName.trim(),
@@ -423,7 +442,6 @@ export default function Dashboard() {
           setEditError("Esiste già una stampante con questa combinazione di IP e porta.");
           return;
         }
-        // Validazione campi
         if (
           editFields.model.trim() === "" ||
           editFields.ip_address.trim() === "" ||
@@ -435,6 +453,22 @@ export default function Dashboard() {
         }
         if (!isValidIP(editFields.ip_address.trim())) {
           setEditError("Inserisci un indirizzo IP valido (es. 192.168.1.100)");
+          return;
+        }
+        if (editFields.model.length > 40) {
+        setEditError("Il modello non può superare 40 caratteri.");
+        return;
+        }
+        if (editFields.description.length > 80) {
+          setEditError("La descrizione non può superare 80 caratteri.");
+          return;
+        }
+        if (!/^\d+$/.test(editFields.modbus_address)) {
+          setEditError("L'indirizzo Modbus deve essere un numero.");
+          return;
+        }
+        if (!/^\d+$/.test(editFields.modbus_port)) {
+          setEditError("La porta Modbus deve essere un numero.");
           return;
         }
         try {
@@ -749,6 +783,7 @@ export default function Dashboard() {
                 type="text"
                 placeholder="Nome stampante"
                 value={newPrinterName}
+                maxLength={20}
                 onChange={(e) => setNewPrinterName(e.target.value)}
                 className="w-full p-2 border rounded"
               />
@@ -756,6 +791,7 @@ export default function Dashboard() {
                 type="text"
                 placeholder="Modello"
                 value={newPrinterDetails.model}
+                maxLength={40}
                 onChange={(e) => setNewPrinterDetails({ ...newPrinterDetails, model: e.target.value })}
                 className="w-full p-2 border rounded"
               />
@@ -770,6 +806,8 @@ export default function Dashboard() {
                 type="text"
                 placeholder="Indirizzo Modbus"
                 value={newPrinterModbusAddress}
+                min={0}
+                max={255} 
                 onChange={(e) => setNewPrinterModbusAddress(e.target.value)}
                 className="w-full p-2 border rounded"
               />
@@ -777,12 +815,15 @@ export default function Dashboard() {
                 type="text"
                 placeholder="Porta Modbus"
                 value={newPrinterModbusPort}
+                min={0}
+                max={65535}
                 onChange={(e) => setNewPrinterModbusPort(e.target.value)}
                 className="w-full p-2 border rounded"
               />
               <textarea
                 placeholder="Descrizione"
                 value={newPrinterDescription}
+                maxLength={80}
                 onChange={(e) => setNewPrinterDescription(e.target.value)}
                 className="w-full p-2 border rounded"
               ></textarea>
@@ -825,6 +866,7 @@ export default function Dashboard() {
           type="text"
           placeholder="Modello"
           value={editFields.model}
+          maxLength={40}
           onChange={e => setEditFields(f => ({ ...f, model: e.target.value }))}
           className="w-full p-2 border rounded"
         />
@@ -839,6 +881,8 @@ export default function Dashboard() {
           type="text"
           placeholder="Indirizzo Modbus"
           value={editFields.modbus_address}
+          min={0}
+          max={255}
           onChange={e => setEditFields(f => ({ ...f, modbus_address: e.target.value }))}
           className="w-full p-2 border rounded"
         />
@@ -846,12 +890,15 @@ export default function Dashboard() {
           type="text"
           placeholder="Porta Modbus"
           value={editFields.modbus_port}
+          min={0}
+          max={65535}
           onChange={e => setEditFields(f => ({ ...f, modbus_port: e.target.value }))}
           className="w-full p-2 border rounded"
         />
         <textarea
           placeholder="Descrizione"
           value={editFields.description}
+          maxLength={80}
           onChange={e => setEditFields(f => ({ ...f, description: e.target.value }))}
           className="w-full p-2 border rounded"
         ></textarea>
