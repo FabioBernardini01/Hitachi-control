@@ -21,15 +21,6 @@ export function AuthProvider({ children }) {
       setToken(res.data.token);
       setRefreshToken(res.data.refreshToken);
 
-      // Aggiorna subito last_seen dopo login
-      try {
-        await axios.post(`${BACKEND_URL}/update-last-seen`, {}, {
-          headers: { Authorization: `Bearer ${res.data.token}` }
-        });
-      } catch (e) {
-        // Ignora eventuali errori di update last_seen
-      }
-
       return { success: true };
     } catch (err) {
       // Prendi il messaggio e i tentativi rimasti dal backend, se presenti

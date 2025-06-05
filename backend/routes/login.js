@@ -104,16 +104,16 @@ const token = jwt.sign(
     refreshTokens[refreshToken] = user.id; // Salva in memoria (usa DB in prod)
 
     // Salva il token attivo nel DB per l'utente
-    await req.db.query(
-      'UPDATE users SET session_token = $1 WHERE id = $2',
-      [token, user.id]
-    );
+      await req.db.query(
+        'UPDATE users SET session_token = $1, last_seen = NOW() WHERE id = $2',
+        [token, user.id]
+      );
 
     return res.json({ token, refreshToken });
-  } catch (error) {
-    console.error('Errore durante la login:', error);
-    return res.status(500).json({ message: 'Errore interno del server' });
-  }
+      } catch (error) {
+        console.error('Errore durante la login:', error);
+        return res.status(500).json({ message: 'Errore interno del server' });
+      }
 });
 
 module.exports = { router, refreshTokens };

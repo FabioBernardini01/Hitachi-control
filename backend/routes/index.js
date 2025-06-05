@@ -15,8 +15,6 @@ const agentCommandResult = require('./agentCommandResult');
 const agentNextCommand = require('./agentNextCommand');
 const logoutRoutes = require('./logout');
 const changePasswordRoutes = require('./changePassword');
-const updateLastSeen = require('./updateLastSeen');
-
 
 const router = express.Router();
 
@@ -36,8 +34,6 @@ router.use(agentCommandResult);
 router.use(agentNextCommand);
 router.use(logoutRoutes);
 router.use(changePasswordRoutes);
-router.use(updateLastSeen);       
-
 
 module.exports = router;
 

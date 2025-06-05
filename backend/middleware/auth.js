@@ -23,6 +23,10 @@ function authenticateJWT(req, res, next) {
           return res.status(403).json({ message: 'Utente disabilitato' });
         }
         req.user = user;
+        await req.db.query(
+        'UPDATE users SET last_seen = NOW() WHERE id = $1',
+        [user.userId]
+        );
         next();
       } catch (e) {
         return res.status(500).json({ message: 'Errore autenticazione' });

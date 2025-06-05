@@ -271,15 +271,6 @@ export default function Dashboard() {
     // eslint-disable-next-line
   }, [printers, token]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      axios.post(`${BACKEND_URL}/update-last-seen`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      }).catch(() => {});
-    }, 20000);
-    return () => clearInterval(interval);
-  }, [token]);
-
   // Refresh stato ogni 5 secondi
   useEffect(() => {
     const interval = setInterval(() => {
