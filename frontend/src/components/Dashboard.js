@@ -55,7 +55,7 @@ export default function Dashboard() {
     description: ""
   });
   const [editError, setEditError] = useState("");
-
+  const [printerToDelete, setPrinterToDelete] = useState(null);
   const maxDevices = company?.max_devices || 1;
   const canAddPrinter = printers.length < maxDevices;
 
@@ -693,7 +693,7 @@ export default function Dashboard() {
                               Modifica
                             </button>
                             <button
-                              onClick={() => handleDelete(printer.id)}
+                              onClick={() => setPrinterToDelete(printer)}
                               className="bg-red-500 text-white w-full sm:w-auto min-w-[140px] px-4 py-3 text-base font-semibold rounded hover:bg-red-600 transition"
                             >
                               Elimina
@@ -972,6 +972,32 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+      {/* Modale per conferma eliminazione stampante */}
+      {printerToDelete && (
+                <div className="modal bg-black bg-opacity-50 fixed inset-0 flex items-center justify-center z-50">
+                  <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full text-center">
+                    <h2 className="text-xl font-semibold mb-4">Conferma eliminazione</h2>
+                    <p>Sei sicuro di voler eliminare la stampante <b>{printerToDelete.name}</b>?</p>
+                    <div className="mt-6 flex justify-center gap-4">
+                      <button
+                        onClick={() => {
+                          handleDelete(printerToDelete.id);
+                          setPrinterToDelete(null);
+                        }}
+                        className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+                      >
+                        Elimina
+                      </button>
+                      <button
+                        onClick={() => setPrinterToDelete(null)}
+                        className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition"
+                      >
+                        Annulla
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
     </div>
   );
 }
