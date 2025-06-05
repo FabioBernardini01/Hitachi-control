@@ -45,6 +45,16 @@ export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [summaryPrinter, setSummaryPrinter] = useState(null);
   const [summaryKey, setSummaryKey] = useState(0);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editPrinter, setEditPrinter] = useState(null);
+  const [editFields, setEditFields] = useState({
+    model: "",
+    ip_address: "",
+    modbus_address: "",
+    modbus_port: "",
+    description: ""
+  });
+  const [editError, setEditError] = useState("");
 
   const maxDevices = company?.max_devices || 1;
   const canAddPrinter = printers.length < maxDevices;
@@ -341,6 +351,11 @@ export default function Dashboard() {
       return;
     }
 
+     if (isDuplicateIPPort(newPrinterDetails.location.trim(), newPrinterModbusPort.trim())) {
+    showError("Esiste già una stampante con questa combinazione di IP e porta.");
+    return;
+  }
+
     const newPrinter = {
       name: newPrinterName.trim(),
       model: newPrinterDetails.model.trim(),
@@ -377,6 +392,81 @@ export default function Dashboard() {
         }
       });
   };
+
+
+    function handleOpenEditModal(printer) {
+      setEditPrinter(printer);
+      setEditFields({
+        model: printer.model || "",
+        ip_address: printer.ip_address || "",
+        modbus_address: printer.modbus_address || "",
+        modbus_port: printer.modbus_port || "",
+        description: printer.description || ""
+      });
+      setEditError("");
+      setEditModalOpen(true);
+    }
+
+    function isDuplicateIPPort(ip, port, excludeId = null) {
+      return printers.some(
+        (p) =>
+          p.ip_address === ip &&
+          p.modbus_port === port &&
+          (excludeId === null || p.id !== excludeId)
+      );
+    }
+
+
+    async function handleEditPrinter() {
+  // Controllo duplicato IP+porta
+        if (isDuplicateIPPort(editFields.ip_address.trim(), editFields.modbus_port.trim(), editPrinter.id)) {
+          setEditError("Esiste già una stampante con questa combinazione di IP e porta.");
+          return;
+        }
+        // Validazione campi
+        if (
+          editFields.model.trim() === "" ||
+          editFields.ip_address.trim() === "" ||
+          editFields.modbus_address.trim() === "" ||
+          editFields.modbus_port.trim() === ""
+        ) {
+          setEditError("Tutti i campi obbligatori devono essere compilati.");
+          return;
+        }
+        if (!isValidIP(editFields.ip_address.trim())) {
+          setEditError("Inserisci un indirizzo IP valido (es. 192.168.1.100)");
+          return;
+        }
+        try {
+          const res = await axios.post(
+            `${BACKEND_URL}/printer/update`,
+            {
+              id: editPrinter.id,
+              model: editFields.model.trim(),
+              ip_address: editFields.ip_address.trim(),
+              modbus_address: editFields.modbus_address.trim(),
+              modbus_port: editFields.modbus_port.trim(),
+              description: editFields.description.trim()
+            },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          setPrinters((prev) =>
+            prev.map((p) => (p.id === editPrinter.id ? res.data.printer : p))
+          );
+          setEditModalOpen(false);
+          setEditPrinter(null);
+          setEditFields({
+            model: "",
+            ip_address: "",
+            modbus_address: "",
+            modbus_port: "",
+            description: ""
+          });
+          setEditError("");
+        } catch (err) {
+          setEditError("Errore durante la modifica della stampante.");
+        }
+      }
 
   const handleCloseModal = () => {
     setNewPrinterName("");
@@ -563,6 +653,12 @@ export default function Dashboard() {
                               Seleziona
                             </button>
                             <button
+                              onClick={() => handleOpenEditModal(printer)}
+                              className="bg-orange-300 text-white w-full sm:w-auto min-w-[140px] px-4 py-3 text-base font-semibold rounded hover:bg-orange-400 transition"
+                            >
+                              Modifica
+                            </button>
+                            <button
                               onClick={() => handleDelete(printer.id)}
                               className="bg-red-500 text-white w-full sm:w-auto min-w-[140px] px-4 py-3 text-base font-semibold rounded hover:bg-red-600 transition"
                             >
@@ -708,6 +804,75 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      {editModalOpen && (
+  <div className="modal bg-black bg-opacity-50 fixed inset-0 flex items-center justify-center z-50">
+    <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+      <h2 className="text-2xl font-semibold text-center mb-4">Modifica Stampante</h2>
+      {editError && (
+        <div className="text-red-500 text-center mb-4">
+          <p>{editError}</p>
+        </div>
+      )}
+      <div className="space-y-4">
+        <input
+          type="text"
+          value={editPrinter?.name || ""}
+          disabled
+          className="w-full p-2 border rounded bg-gray-200 text-gray-500"
+        />
+        <input
+          type="text"
+          placeholder="Modello"
+          value={editFields.model}
+          onChange={e => setEditFields(f => ({ ...f, model: e.target.value }))}
+          className="w-full p-2 border rounded"
+        />
+        <input
+          type="text"
+          placeholder="Indirizzo IP"
+          value={editFields.ip_address}
+          onChange={e => setEditFields(f => ({ ...f, ip_address: e.target.value }))}
+          className="w-full p-2 border rounded"
+        />
+        <input
+          type="text"
+          placeholder="Indirizzo Modbus"
+          value={editFields.modbus_address}
+          onChange={e => setEditFields(f => ({ ...f, modbus_address: e.target.value }))}
+          className="w-full p-2 border rounded"
+        />
+        <input
+          type="text"
+          placeholder="Porta Modbus"
+          value={editFields.modbus_port}
+          onChange={e => setEditFields(f => ({ ...f, modbus_port: e.target.value }))}
+          className="w-full p-2 border rounded"
+        />
+        <textarea
+          placeholder="Descrizione"
+          value={editFields.description}
+          onChange={e => setEditFields(f => ({ ...f, description: e.target.value }))}
+          className="w-full p-2 border rounded"
+        ></textarea>
+      </div>
+      <div className="mt-4 text-center">
+        <button
+          onClick={handleEditPrinter}
+          className="bg-orange-400 text-white p-2 rounded hover:bg-orange-500 transition"
+        >
+          Salva modifiche
+        </button>
+        <button
+          onClick={() => setEditModalOpen(false)}
+          className="ml-2 bg-gray-500 text-white p-2 rounded hover:bg-gray-600 transition"
+        >
+          Annulla
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       {/* Modale aggiornamento email */}
       {showEmailModal && (

@@ -4,6 +4,7 @@ const getCompanyRoutes = require('./getCompany');
 const getPrintersRoutes = require('./getPrinters');
 const createPrintersRoutes = require('./createPrinters');
 const deletePrintersRoutes = require('./deletePrinters');
+const updatePrintersRoutes = require('./updatePrinters');
 const getUsername = require('./getUsername');   
 const modbusPrinterStatus = require('./modbusPrinterStatus');
 const modbusWriteRegister = require('./modbusWriteRegister');
@@ -24,6 +25,7 @@ router.use(getCompanyRoutes);
 router.use(getPrintersRoutes);
 router.use(createPrintersRoutes);
 router.use(deletePrintersRoutes);
+router.use(updatePrintersRoutes);
 router.use(getUsername);
 router.use(modbusPrinterStatus);
 router.use(modbusWriteRegister);
@@ -38,4 +40,6 @@ router.use(updateLastSeen);
 
 
 module.exports = router;
+
+
 
