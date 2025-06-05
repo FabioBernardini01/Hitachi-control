@@ -263,7 +263,7 @@ export default function Dashboard() {
     }
   }
 
-  // Aggiorna stato stampanti ogni volta che cambia la lista
+  // Aggiorna stato stampanti ogni volta che cambia la lista //
   useEffect(() => {
     if (printers.length > 0) {
       printers.forEach(printer => fetchPrinterStatus(printer));
