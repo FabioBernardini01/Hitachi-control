@@ -41,7 +41,7 @@ export default function Summary({ printer, token, onClose }) {
           axios.post(`${BACKEND_URL}/readInputRegister`, {
             name: printer.name, address: 0x0BEB, length: 1
           }, { headers: { Authorization: `Bearer ${token}` } }),
-          axios.post(`${BACKEND_URL}/readHoldingRegister`, {
+          axios.post(`${BACKEND_URL}/readStatus`, {
             name: printer.name, address: 0x2494, length: 1
           }, { headers: { Authorization: `Bearer ${token}` } }),
         ]);
