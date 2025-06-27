@@ -3,6 +3,18 @@ import axios from "axios";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:4000";
 
+// Funzione per tradurre il valore di Remote operation
+function getRemoteOperationLabel(value) {
+  switch (value) {
+    case 0: return "Avvio operazione";
+    case 1: return "Arresto operazione";
+    case 2: return "Deflection voltage ON";
+    case 3: return "Deflection voltage OFF";
+    case 4: return "Reset guasto";
+    default: return value;
+  }
+}
+
 export default function Summary({ printer, token, onClose }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -12,8 +24,8 @@ export default function Summary({ printer, token, onClose }) {
     async function fetchSummary() {
       setLoading(true);
       try {
-        // Leggi registri utili
-        const [holding0, opStatus, warning, error, ink] = await Promise.all([
+        // Leggi registri utili, aggiungi Remote operation (0x2494)
+        const [holding0, opStatus, warning, error, ink, remoteOp] = await Promise.all([
           axios.post(`${BACKEND_URL}/readStatus`, {
             name: printer.name, address: 0x0000, length: 1
           }, { headers: { Authorization: `Bearer ${token}` } }),
@@ -29,6 +41,9 @@ export default function Summary({ printer, token, onClose }) {
           axios.post(`${BACKEND_URL}/readInputRegister`, {
             name: printer.name, address: 0x0BEB, length: 1
           }, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.post(`${BACKEND_URL}/readHoldingRegister`, {
+            name: printer.name, address: 0x2494, length: 1
+          }, { headers: { Authorization: `Bearer ${token}` } }),
         ]);
         if (!cancelled) {
           setData({
@@ -39,6 +54,7 @@ export default function Summary({ printer, token, onClose }) {
             classification: error.data?.data?._values?.[1],
             errorFactor: error.data?.data?._values?.[2],
             inkLevel: ink.data?.data?._values?.[0],
+            remoteOperation: remoteOp.data?.data?._values?.[0],
           });
         }
       } catch (err) {
@@ -70,6 +86,10 @@ export default function Summary({ printer, token, onClose }) {
             <b>Errore:</b> FC={data.functionCode} CL={data.classification} EF={data.errorFactor}
           </li>
           <li><b>Livello inchiostro (input 0x0BEB):</b> {data.inkLevel}</li>
+          <li>
+            <b>Remote operation (holding 0x2494):</b>{" "}
+            {getRemoteOperationLabel(data.remoteOperation)}
+          </li>
         </ul>
       )}
     </div>
