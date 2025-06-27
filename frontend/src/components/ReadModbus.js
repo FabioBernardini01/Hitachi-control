@@ -13,6 +13,8 @@ const REGISTER_DEFINITIONS = [
   { label: "Character Code 1", address: 0x0084, type: "holding" },
   { label: "Character Code 2", address: 0x0085, type: "holding" },
   { label: "Character Code 3", address: 0x0086, type: "holding" },
+  { label: "Remote operation", address: 0x2494, type: "holding", min: 0, max: 4 }, // <--- AGGIUNGI QUI
+
 
   // Input registers
   { label: "Communication Status", address: 0x0000, type: "input" },
@@ -49,6 +51,15 @@ function getHumanValue(reg, value) {
       if (value === 1) return "Automatica";
       if (value === 2) return "Altro";
       return value;
+    case 0x2494: // Remote operation
+      switch (value) {
+        case 0: return "Avvio operazione";
+        case 1: return "Arresto operazione";
+        case 2: return "Deflection voltage ON";
+        case 3: return "Deflection voltage OFF";
+        case 4: return "Reset guasto";
+        default: return value;
+      }
     case 0x0051: // Pump status
     case 0x0052: // Valve status
       return value === 1 ? "ON" : "OFF";
@@ -75,28 +86,23 @@ function renderWriteInput(reg, writeValue, setWriteValue) {
           <option value="2">ERRORE</option>
         </select>
       );
+    case 0x2494: // Remote operation
+      return (
+        <select
+          value={writeValue}
+          onChange={e => setWriteValue(e.target.value)}
+          className="border p-2 rounded w-full"
+        >
+          <option value="">Seleziona...</option>
+          <option value="0">Avvio operazione</option>
+          <option value="1">Arresto operazione</option>
+          <option value="2">Deflection voltage ON</option>
+          <option value="3">Deflection voltage OFF</option>
+          <option value="4">Reset guasto</option>
+        </select>
+      );
     case 0x0011: // Inter-character space
-      return (
-        <input
-          type="number"
-          min={reg.min}
-          max={reg.max}
-          value={writeValue}
-          onChange={e => setWriteValue(e.target.value)}
-          className="border p-2 rounded w-full"
-        />
-      );
     case 0x0012: // Print speed
-      return (
-        <input
-          type="number"
-          min={reg.min}
-          max={reg.max}
-          value={writeValue}
-          onChange={e => setWriteValue(e.target.value)}
-          className="border p-2 rounded w-full"
-        />
-      );
     case 0x0013: // Print density
       return (
         <input
@@ -108,7 +114,6 @@ function renderWriteInput(reg, writeValue, setWriteValue) {
           className="border p-2 rounded w-full"
         />
       );
-    // ...resto invariato...
     default:
       return (
         <input
