@@ -7,7 +7,7 @@ const users = [
   { username: 'utenteC', password: 'password', company_id: 2, failed_attempts: 0, locked_until: null, enabled: true, session_token: null, last_seen: null, agent: false, agent_login_forced_count: 0, agent_login_forced_last: null },
   { username: 'utenteD', password: 'password', company_id: 3, failed_attempts: 0, locked_until: null, enabled: true, session_token: null, last_seen: null, agent: false, agent_login_forced_count: 0, agent_login_forced_last: null },
   { username: 'lkj', password: 'òlkpoi098', company_id: 3, failed_attempts: 0, locked_until: null, enabled: true, session_token: null, last_seen: null, agent: false, agent_login_forced_count: 0, agent_login_forced_last: null },
-  // AGENT USERS (uno per azienda)
+  // AGENT USERS (uno per azienda!)
   { username: process.env.AGENT1_USERNAME, password: process.env.AGENT1_PASSWORD, company_id: 1, failed_attempts: 0, locked_until: null, enabled: true, session_token: null, last_seen: null, agent: true, agent_login_forced_count: 0, agent_login_forced_last: null },
   { username: process.env.AGENT2_USERNAME, password: process.env.AGENT2_PASSWORD, company_id: 2, failed_attempts: 0, locked_until: null, enabled: true, session_token: null, last_seen: null, agent: true, agent_login_forced_count: 0, agent_login_forced_last: null },
   { username: process.env.AGENT3_USERNAME, password: process.env.AGENT3_PASSWORD, company_id: 3, failed_attempts: 0, locked_until: null, enabled: true, session_token: null, last_seen: null, agent: true, agent_login_forced_count: 0, agent_login_forced_last: null },
